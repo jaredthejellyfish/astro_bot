@@ -73,10 +73,10 @@ xml_template = """
 
 parser = argparse.ArgumentParser()
 
+parser.add_argument("-f", help="File name")
 parser.add_argument("-c", help="Image count (default is 10)")
 parser.add_argument("-n", help="Plan name")
 parser.add_argument("-d", help="Dithering (y/n)")
-parser.add_argument("-f", help="File name")
 parser.add_argument("-p", help="Pause")
 
 args = parser.parse_args()
@@ -149,7 +149,6 @@ def generate_plan_data(count, name, dither, f_name, pause):
     data = {"plan_name":name, "dither":dither, "temp":setting_list[0], "coords":coords, "gain":setting_list[1], "exposure":setting_list[2], "bnn":setting_list[3], "count":count, "pause":pause}
     xml = xml_template%data
     return xml
-
 
 xml = generate_plan_data(count, name, dither, f_name, pause)
 
