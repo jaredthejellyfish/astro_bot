@@ -3,7 +3,7 @@
 #
 # (C) 2020 Gerard Almenara, Barcelona, Spain
 # Released under GNU Public License (GPL)
-# email jarredthejellyfish@gmail.com
+# Email: jarredthejellyfish@gmail.com
 #
 # Whiptail wiki: https://en.wikibooks.org/wiki/Bash_Shell_Scripting/Whiptail#Password_box
 # -----------------------------------------------------------
