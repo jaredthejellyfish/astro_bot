@@ -49,6 +49,8 @@ function error_message {
     whiptail --title "APT XML" --msgbox "Damn, there was an error generating your file. Hit OK to exit the program and relaunch it to try again." 8 78
 }
 
+rm -rf *.xml
+
 #Initial welcome screen
 whiptail --title "APT XML" --msgbox "Welcome to APT XML Plan Generator. You must hit OK to continue." 8 78
 
