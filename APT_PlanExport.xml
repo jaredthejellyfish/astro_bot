@@ -1,9 +1,8 @@
-
 <?xml version="1.0"?>
 	<CCDPlans>
 	<CCDLightPlans>
 		<Plan>
-			<Name>400s</Name>
+			<Name>ASI_294MC_Pro_Cool_HorseheadNebula</Name>
 			<DontDither>-1</DontDither>
 			<Vertical>0</Vertical>
 			<Exposures>
@@ -23,7 +22,7 @@
 				<Bin>1x1</Bin>
 				<Pause>1</Pause>
 				<Count>1</Count>
-				<RunCommand>#GoTo++ 20 Blind 5.68194444 -2.44888889</RunCommand>
+				<RunCommand>#GoTo++ 20 Blind 5.68083333 -2.45694444</RunCommand>
 				<WaitCommand>0</WaitCommand>
 				<Filter>-1</Filter>
 				<FrameType>-1</FrameType>
@@ -41,10 +40,10 @@
 			</Exposures>
 			<Exposures>
 				<Order>4</Order>
-				<Exp>400.0</Exp>
-				<Bin>1x1/Bin>
-				<Pause>5</Pause>
-				<Count>10</Count>
+				<Exp>600.0</Exp>
+				<Bin>1x1</Bin>
+				<Pause>90</Pause>
+				<Count>20</Count>
 				<RunCommand></RunCommand>
 				<WaitCommand>0</WaitCommand>
 				<Filter>-1</Filter>

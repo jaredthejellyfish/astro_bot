@@ -14,8 +14,7 @@ import numpy as np
 import re, argparse
 
 
-xml_template = """
-<?xml version="1.0"?>
+xml_template = """<?xml version="1.0"?>
 	<CCDPlans>
 	<CCDLightPlans>
 		<Plan>
@@ -58,7 +57,7 @@ xml_template = """
 			<Exposures>
 				<Order>4</Order>
 				<Exp>%(exposure)s</Exp>
-				<Bin>%(bnn)s/Bin>
+				<Bin>%(bnn)s</Bin>
 				<Pause>%(pause)s</Pause>
 				<Count>%(count)s</Count>
 				<RunCommand></RunCommand>
@@ -73,7 +72,7 @@ xml_template = """
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument("-f", help="File name")
+parser.add_argument("-f", help="Input file name")
 parser.add_argument("-c", help="Image count (default is 10)")
 parser.add_argument("-n", help="Plan name")
 parser.add_argument("-d", help="Dithering (y/n)")
@@ -105,7 +104,7 @@ if args.p:
 else:
     pause = "5"
 
-def xml_file_generation_writing(plan_file, xml):
+def xml_file_generation_writing(f_name, xml):
     plan_file = open("APT_PlanExport.xml", "w+")
     plan_file.write(xml)
     plan_file.close()
