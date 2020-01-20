@@ -59,6 +59,7 @@ if (whiptail --title "APT XML" --yesno "Would you like to use the default settin
         error_message
     else
         generating_file
+        echo -e "\033[0;33mScript executed successfully. Clear skies!\0033[0m"
         file_generated
     fi 2>/dev/null
     
@@ -73,8 +74,11 @@ else
         error_message
     else
         generating_file
+        echo -e "\033[0;33mScript executed successfully. Clear skies!\0033[0m"
         file_generated
     fi 2>/dev/null
 fi
+
+
 
 
