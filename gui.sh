@@ -1,5 +1,12 @@
-#!/bin/bash
-# vars needed:  infile  count   pname   dith    pause           -f  -c  -n  -d  -p
+# -----------------------------------------------------------
+# Generates a continuation to prior APT plan from FIT file Whiptail GUI
+#
+# (C) 2020 Gerard Almenara, Barcelona, Spain
+# Released under GNU Public License (GPL)
+# email jarredthejellyfish@gmail.com
+#
+# Whiptail wiki: https://en.wikibooks.org/wiki/Bash_Shell_Scripting/Whiptail#Password_box
+# -----------------------------------------------------------
 
 function get_infile {
     INFILE=$(whiptail --inputbox "What is the name of the input file?" 8 78 --title "APT XML" 3>&1 1>&2 2>&3)
@@ -38,16 +45,23 @@ function file_generated {
     whiptail --title "APT XML" --msgbox "File $PNAME has been generated." 8 78
 }
 
+function error_message {
+    whiptail --title "APT XML" --msgbox "Damn, there was an error generating your file. Hit OK to exit the program and relaunch it to try again." 8 78
+}
+
 #Initial welcome screen
 whiptail --title "APT XML" --msgbox "Welcome to APT XML Plan Generator. You must hit OK to continue." 8 78
-
 
 if (whiptail --title "APT XML" --yesno "Would you like to use the default settings?" 8 78); then
     #Default settings
     get_infile
-    command python3 continue_imaging.py -f $INFILE
-    generating_file
-    file_generated
+    if ! command python3 continue_imaging.py -f $INFILE;then
+        error_message
+    else
+        generating_file
+        file_generated
+    fi 2>/dev/null
+    
 else
     #Custom settings, will add a checklist style selection to define which settings to mod from default.
     get_infile
@@ -55,9 +69,12 @@ else
     get_pname
     get_dith
     get_pause
-    command python3 continue_imaging.py -f $INFILE -c $COUNT -n $PNAME -d $DITH -p $PAUSE
-    generating_file
-    file_generated
+    if ! command python3 continue_imaging.py -f $INFILE -c $COUNT -n $PNAME -d $DITH -p $PAUSE;then
+        error_message
+    else
+        generating_file
+        file_generated
+    fi 2>/dev/null
 fi
 
 

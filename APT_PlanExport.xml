@@ -2,7 +2,7 @@
 	<CCDPlans>
 	<CCDLightPlans>
 		<Plan>
-			<Name>ASI_294MC_Pro_Cool_HorseheadNebula</Name>
+			<Name>ASI 294MC Pro Cool (Lights)</Name>
 			<DontDither>-1</DontDither>
 			<Vertical>0</Vertical>
 			<Exposures>
@@ -42,8 +42,8 @@
 				<Order>4</Order>
 				<Exp>600.0</Exp>
 				<Bin>1x1</Bin>
-				<Pause>90</Pause>
-				<Count>20</Count>
+				<Pause>5</Pause>
+				<Count>10</Count>
 				<RunCommand></RunCommand>
 				<WaitCommand>0</WaitCommand>
 				<Filter>-1</Filter>
