@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+	<CCDPlans>
+	<CCDLightPlans>
+		<Plan>
+			<Name>ASI 294MC Pro Cool (Lights)</Name>
+			<DontDither>-1</DontDither>
+			<Vertical>0</Vertical>
+			<Exposures>
+				<Order>1</Order>
+				<Exp>0</Exp>
+				<Bin>1x1</Bin>
+				<Pause>1</Pause>
+				<Count>1</Count>
+				<RunCommand>#CCDCool A -15.0</RunCommand>
+				<WaitCommand>0</WaitCommand>
+				<Filter>-1</Filter>
+				<FrameType>-1</FrameType>
+			</Exposures>
+			<Exposures>
+				<Order>2</Order>
+				<Exp>0</Exp>
+				<Bin>1x1</Bin>
+				<Pause>1</Pause>
+				<Count>1</Count>
+				<RunCommand>#GoTo++ 20 Blind 5.68083333 -2.45694444</RunCommand>
+				<WaitCommand>0</WaitCommand>
+				<Filter>-1</Filter>
+				<FrameType>-1</FrameType>
+			</Exposures>
+			<Exposures>
+				<Order>3</Order>
+				<Exp>0</Exp>
+				<Bin>1x1</Bin>
+				<Pause>1</Pause>
+				<Count>1</Count>
+				<RunCommand>#CCDGain 120</RunCommand>
+				<WaitCommand>0</WaitCommand>
+				<Filter>-1</Filter>
+				<FrameType>-1</FrameType>
+			</Exposures>
+			<Exposures>
+				<Order>4</Order>
+				<Exp>600.0</Exp>
+				<Bin>1x1</Bin>
+				<Pause>5</Pause>
+				<Count>10</Count>
+				<RunCommand></RunCommand>
+				<WaitCommand>0</WaitCommand>
+				<Filter>-1</Filter>
+				<FrameType>-1</FrameType>
+			</Exposures>
+		</Plan>
+	</CCDLightPlans>
+	</CCDPlans>

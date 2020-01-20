@@ -8,6 +8,7 @@
 # Whiptail wiki: https://en.wikibooks.org/wiki/Bash_Shell_Scripting/Whiptail#Password_box
 # -----------------------------------------------------------
 
+#Function bloc 
 function get_infile {
     INFILE=$(whiptail --inputbox "What is the name of the input file?" 8 78 --title "APT XML" 3>&1 1>&2 2>&3)
 }
@@ -49,6 +50,7 @@ function error_message {
     whiptail --title "APT XML" --msgbox "Damn, there was an error generating your file. Hit OK to exit the program and relaunch it to try again." 8 78
 }
 
+#Initial folder cleanup
 rm -rf *.xml
 
 #Initial welcome screen
