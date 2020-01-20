@@ -38,14 +38,18 @@ function file_generated {
     whiptail --title "APT XML" --msgbox "File $PNAME has been generated." 8 78
 }
 
+#Initial welcome screen
 whiptail --title "APT XML" --msgbox "Welcome to APT XML Plan Generator. You must hit OK to continue." 8 78
 
+
 if (whiptail --title "APT XML" --yesno "Would you like to use the default settings?" 8 78); then
+    #Default settings
     get_infile
     command python3 continue_imaging.py -f $INFILE
     generating_file
     file_generated
 else
+    #Custom settings, will add a checklist style selection to define which settings to mod from default.
     get_infile
     get_count
     get_pname
