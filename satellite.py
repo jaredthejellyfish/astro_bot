@@ -1,5 +1,5 @@
 # API key: '79f7a1995bb5c8006f7f6ce7c542ce51'
-import requests, time, pyglet, pyowm
+import requests, time, pyglet, pyowm, ephem
 
 location = 'Castelldefels, ES'
 
@@ -20,16 +20,16 @@ def forecasting(location):
     rain = three_hour_forecast.will_have_rain()
     fog = three_hour_forecast.will_have_fog()
     clouds = three_hour_forecast.will_have_clouds()
-    return rain, fog, clouds
+    return rain, clouds, fog
 
-def get_sunup_sundw_time(location):
-    loc = owm.weather_at_place(location)
-    weather = loc.get_weather()
-    #sunup = weather.get_sunrise_time(timeformat='iso')[0:19] # Prints time in GMT timezone
-    #sundw = weather.get_sunset_time(timeformat='iso')[0:19] # Prints time in GMT timezone
-    sunup = weather.get_sunrise_time() # Prints time in GMT timezone
-    sundw = weather.get_sunset_time()  # Prints time in GMT timezone
-    return sunup, sundw
+def get_nit_r_day():
+    observer = ephem.city('Barcelona') # <-- put your city here
+    sun = ephem.Sun(observer)
+    sun_is_up = observer.previous_rising(sun) > observer.previous_setting(sun)
+    if sun_is_up:
+        return 1
+    else:
+        return 0
 
 def sat_vis():
     uri = '''https://api.sat24.com/animated/SP/visual/1/width=400%20height=291'''
@@ -56,17 +56,18 @@ def show_gif():
         sprite.draw()
     pyglet.app.run()
 
-def select_sat_freq(location):
-    c_time = get_epoch_time()
-    ss_time = get_sunup_sundw_time(location)[1]
-    su_time = get_sunup_sundw_time(location)[0]
-    if (ss_time - c_time) > 0:
-        sat_vis()
-    elif (su_time - c_time) > 0:
+def sat_img(location):
+    tod = get_nit_r_day()
+    if tod == 0:
         sat_ir()
+    elif tod == 1:
+        sat_vis()
 
-
-select_sat_freq(location)
+sat_img(location)
 show_gif()
 
 
+
+#print('There is going to be', forecasting(location)[0], 'rain')
+#print('There are going to be', forecasting(location)[1], 'clouds')
+#print('There is going to be', forecasting(location)[2], 'fog')
