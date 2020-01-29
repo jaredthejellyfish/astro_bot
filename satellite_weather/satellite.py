@@ -89,4 +89,4 @@ def sat_img(location,emphem_city):
 
 print(forecasting(location))
 sat_img(location,emphem_city)
-show_gif()
+#show_gif()
