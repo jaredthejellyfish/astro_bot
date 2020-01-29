@@ -54,6 +54,7 @@ def unknown_command(update, context):
 def not_command(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id, text="My master hasn't taught me how to read normal text, please send a command.")
 
+
 ncm_handler = MessageHandler(Filters.text, not_command)
 dispatcher.add_handler(ncm_handler)
 
@@ -68,5 +69,6 @@ dispatcher.add_handler(start_handler)
 
 unknown_command_handler = MessageHandler(Filters.command, unknown_command)
 dispatcher.add_handler(unknown_command_handler)
+
 
 updater.start_polling()
