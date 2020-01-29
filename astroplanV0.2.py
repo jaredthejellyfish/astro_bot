@@ -17,7 +17,7 @@ def not_command(update, context):
 def forecast(update, context):
     usr_city = context.args
     try:
-        stringreturn = "Forecast for {} right up!".format(usr_city)
+        stringreturn = "Forecast for {} right up!".format(" ".join(usr_city).title())
         url = generate_link(usr_city)
         context.bot.send_photo(chat_id=update.effective_chat.id, photo=url, caption=stringreturn)
     except:
