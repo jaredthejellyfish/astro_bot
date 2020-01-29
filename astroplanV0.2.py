@@ -70,11 +70,13 @@ def platesolve_image(update, context):
     global solving
     if solving == 1:
         try:
-            print("photo")
             file = context.bot.getFile(update.message.photo[-1].file_id)
             print ("file_id: " + str(update.message.photo[-1].file_id))
-            file.download('image')
+            file.download('image.jpg')
+            print("photo")
         except:
+            file = context.bot.getFile(update.message.document[-1].file_id)
+            file.download('image.fit')
             print("other")
             exit
     else:
