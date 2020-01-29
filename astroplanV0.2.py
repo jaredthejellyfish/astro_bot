@@ -15,6 +15,7 @@ These are the current commands you can currently use:
 
 emphem_city = 'Barcelona'
 
+solving = 0
 
 updater = Updater(token='965873757:AAGDYWeqXydOHcg8PI-qMK_DSH8ojBJn2-s', use_context=True)
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -22,6 +23,17 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 
 dispatcher = updater.dispatcher
+
+def removeTelegramMessageHandler(self, handler):
+        """
+        De-registers a message handler.
+        Args:
+            handler (any):
+        """
+
+        if handler in self.telegram_message_handlers:
+            self.telegram_message_handlers.remove(handler)
+
 
 
 def start(update, context):
@@ -54,9 +66,28 @@ def unknown_command(update, context):
 def not_command(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id, text="My master hasn't taught me how to read normal text, please send a command.")
 
+def platesolve_image(update, context):
+    global solving
+    if solving == 1:
+        try:
+            print("photo")
+            file = context.bot.getFile(update.message.photo[-1].file_id)
+            print ("file_id: " + str(update.message.photo[-1].file_id))
+            file.download('image')
+        except:
+            print("other")
+            exit
+    else:
+        context.bot.send_message(chat_id=update.effective_chat.id, text="Send a command before uploading a picture")
+    
+    solving = 0
+    print(solving)
 
-ncm_handler = MessageHandler(Filters.text, not_command)
-dispatcher.add_handler(ncm_handler)
+def platesolve(update, context):
+    global solving
+    print("platesolver engaged")
+    solving = 1
+    
 
 fc_handler = CommandHandler('fc', forecast)
 dispatcher.add_handler(fc_handler)
@@ -66,6 +97,15 @@ dispatcher.add_handler(sat_handler)
 
 start_handler = CommandHandler('start', start)
 dispatcher.add_handler(start_handler)
+
+solve_handler = CommandHandler('solve', platesolve)
+dispatcher.add_handler(solve_handler)
+
+platesolve_image_handler = MessageHandler(Filters.photo | Filters.document, platesolve_image)
+dispatcher.add_handler(platesolve_image_handler, group=1)
+
+not_command_handler = MessageHandler(Filters.text, not_command)
+dispatcher.add_handler(not_command_handler)
 
 unknown_command_handler = MessageHandler(Filters.command, unknown_command)
 dispatcher.add_handler(unknown_command_handler)

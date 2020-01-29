@@ -32,7 +32,7 @@ def basic_forecast_unform(usr_city):
 def basic_forecast(usr_city):
     unf_forecasting = basic_forecast_unform(usr_city)
     if unf_forecasting[0] == True:
-        return "Damn, it looks like there is gonna be some rain. I wouldn't recommend bringing out the telescope tonight."
+        return "Damn, it looks like there is gonna be some rain. I wouldn't recommend bringing out your telescope tonight."
     elif unf_forecasting[1] == True:
         return "Oh no, it looks like there are gonna be some clouds!"
     elif unf_forecasting[3] > 50:
