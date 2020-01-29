@@ -1,4 +1,5 @@
-import requests, time, pyglet, pyowm, ephem
+import requests, time, pyowm, ephem, os, ffmpy
+
 
 location = 'Castelldefels, ES'
 emphem_city = 'Barcelona'
@@ -27,13 +28,11 @@ def forecasting(location):
     three_hour_forecast = owm.three_hours_forecast(location)
     #Is it gonna rain?
     rain = three_hour_forecast.will_have_rain()
-    #Is it gonna be foggy?
-    fog = three_hour_forecast.will_have_fog()
     #Are clouds gonna roll in?
     clouds = three_hour_forecast.will_have_clouds()
 
     #Return all collected values.
-    return rain, clouds, fog, temperature, humidity, wind_speed
+    return rain, clouds, temperature, humidity, wind_speed
 
 def get_nit_r_day(emphem_city):
     #Generate observer object with location
@@ -62,24 +61,6 @@ def sat_ir():
     with open('sat.gif', 'wb') as f:
         f.write(requests.get(uri).content)
 
-def show_gif():
-    #Open 'sat.gif' file
-    ag_file = 'sat.gif'
-    #Generate animation object
-    animation = pyglet.resource.animation(ag_file)
-    sprite = pyglet.sprite.Sprite(animation)
-
-    #Gnerate window
-    win = pyglet.window.Window(width=sprite.width, height=sprite.height)
-
-    green = 0, 1, 0, 1
-    pyglet.gl.glClearColor(*green)
-    @win.event
-    def on_draw():
-        win.clear()
-        sprite.draw()
-    pyglet.app.run()
-
 def sat_img(location,emphem_city):
     tod = get_nit_r_day(emphem_city)
     if tod == 0:
@@ -87,6 +68,16 @@ def sat_img(location,emphem_city):
     elif tod == 1:
         sat_vis()
 
-print(forecasting(location))
+def sat_gif2mp4():
+    os.system('ffmpeg -hide_banner -loglevel panic -r 5 -i sat.gif -movflags faststart -pix_fmt yuv420p -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" sat.mp4 -y')
+    os.remove('sat.gif')
+
+try:
+    os.remove('sat.mp4')
+    os.remove('sat.gif')
+except:
+    print("")
+
 sat_img(location,emphem_city)
-show_gif()
+sat_gif2mp4()
+
