@@ -1,12 +1,18 @@
 #Bot key:  965873757:AAGDYWeqXydOHcg8PI-qMK_DSH8ojBJn2-s
 from telegram.ext import Updater, InlineQueryHandler, CommandHandler
 import requests, re, os
+from satellite import clean
 from forecast import forecasting
 
 def start(bot, update):
     print("rec")
     chat_id = update.message.chat_id
-    bot.send_chat_action(chat_id=chat_id, text="Hey, welcome to astroplan V0.1!")
+    bot.send_message(chat_id=chat_id, text="Hey!\nWelocme to astroplan, a bot designed to make you astronomy planning journey esier. \nThese are the current commands you can use: \n· /sat - Pulls cloud images from a satellite. \n· /forecast - Generates a forecast for the nearest city to you.")
+
+def caps(update, context):
+    print("abc")
+    text_caps = ' '.join(context.args).upper()
+    context.bot.send_message(chat_id=update.effective_chat.id, text=text_caps)
 
 def forecast(bot, update):
     url = 'https://clearoutside.com/forecast_image_large/41.33/1.99/forecast.png'
@@ -34,6 +40,7 @@ def satellite(bot, update):
 def main():
     updater = Updater('965873757:AAGDYWeqXydOHcg8PI-qMK_DSH8ojBJn2-s', request_kwargs={'read_timeout': 1000, 'connect_timeout': 1000})
     dp = updater.dispatcher
+    dp.add_handler(CommandHandler('caps', caps))
     dp.add_handler(CommandHandler('start', start))
     dp.add_handler(CommandHandler('forecast', forecast))
     dp.add_handler(CommandHandler('sat', satellite))

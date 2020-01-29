@@ -9,12 +9,6 @@ def clean():
     except:
         return "Neat dirs."
 
-def get_epoch_time():
-    #Get time
-    seconds = time.time()
-    #Return rounded time in seconds
-    return round(seconds)
-
 def get_nit_r_day(emphem_city):
     #Generate observer object with location
     observer = ephem.city(emphem_city)
