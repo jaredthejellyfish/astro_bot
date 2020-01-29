@@ -2,6 +2,8 @@ import requests, ephem, os, ffmpy
 
 emphem_city = 'Barcelona'
 
+region = 'SP'
+
 def clean():
     try:
         os.remove('sat.mp4')
@@ -47,8 +49,8 @@ def sat_gif2mp4():
     os.system('ffmpeg -hide_banner -loglevel panic -r 5 -i sat.gif -movflags faststart -pix_fmt yuv420p -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" sat.mp4 -y')
     os.remove('sat.gif')
 
-print("Sat pul requested.")
+
 clean()
 sat_img(emphem_city, region)
 sat_gif2mp4()
-print("Sat pull complete.")
+
