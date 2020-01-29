@@ -22,33 +22,33 @@ def get_nit_r_day(emphem_city):
     else:
         return False
 
-def sat_vis():
+def sat_vis(region):
     #Pull visual light gif from Sat24
-    uri = '''https://api.sat24.com/animated/SP/visual/1/width=400%20height=291'''
+    uri = '''https://api.sat24.com/animated/{}/visual/1/width=400%20height=291'''.format(region)
     #Write pulled gif to the 'sat.gif' 
     with open('sat.gif', 'wb') as f:
         f.write(requests.get(uri).content)
 
-def sat_ir():
+def sat_ir(region):
     #Pull IR gif from Sat24
-    uri = '''https://api.sat24.com/animated/SP/infraPolair/1/width=800%20height=582'''
+    uri = '''https://api.sat24.com/animated/{}/infraPolair/1/width=800%20height=582'''.format(region)
     #Write pulled gif to the 'sat.gif' 
     with open('sat.gif', 'wb') as f:
         f.write(requests.get(uri).content)
 
-def sat_img(emphem_city):
+def sat_img(emphem_city, region):
     tod = get_nit_r_day(emphem_city)
     if tod == 0:
-        sat_ir()
+        sat_ir(region)
     elif tod == 1:
-        sat_vis()
+        sat_vis(region)
 
 def sat_gif2mp4():
-    os.system('ffmpeg -hide_banner -loglevel panic -r 2 -i sat.gif -movflags faststart -pix_fmt yuv420p -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" sat.mp4 -y')
+    os.system('ffmpeg -hide_banner -loglevel panic -r 5 -i sat.gif -movflags faststart -pix_fmt yuv420p -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" sat.mp4 -y')
     os.remove('sat.gif')
 
 print("Sat pul requested.")
 clean()
-sat_img(emphem_city)
+sat_img(emphem_city, region)
 sat_gif2mp4()
 print("Sat pull complete.")

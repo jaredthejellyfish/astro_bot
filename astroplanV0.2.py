@@ -1,6 +1,9 @@
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
-import logging
 from forecast import generate_link, basic_forecast
+from satellite import sat_img, sat_gif2mp4
+import logging, os
+
+emphem_city = 'Barcelona'
 
 updater = Updater(token='965873757:AAGDYWeqXydOHcg8PI-qMK_DSH8ojBJn2-s', use_context=True)
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -26,11 +29,25 @@ def forecast(update, context):
 def caps(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id, text="got sum thicc context")
 
+def satellite(update, context):
+    usr_city = " ".join(context.args[1:])
+    region = "".join(context.args[0])
+    try:
+        caption_text = basic_forecast(usr_city)
+        sat_img(emphem_city, region) 
+        sat_gif2mp4()
+        context.bot.send_video(chat_id=update.effective_chat.id, video=open('sat.mp4', 'rb'), caption=caption_text)
+    except:
+        context.bot.send_message(chat_id=update.effective_chat.id, text="Please provide a valid city name.")
+
 
 caps_handler = CommandHandler('title', caps)
 dispatcher.add_handler(caps_handler)
 
 caps_handler = CommandHandler('fc', forecast)
+dispatcher.add_handler(caps_handler)
+
+caps_handler = CommandHandler('sat', satellite)
 dispatcher.add_handler(caps_handler)
 
 echo_handler = MessageHandler(Filters.text, not_command)
