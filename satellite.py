@@ -51,6 +51,3 @@ def sat_gif2mp4():
 
 
 clean()
-sat_img(emphem_city, region)
-sat_gif2mp4()
-

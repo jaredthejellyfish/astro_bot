@@ -1,6 +1,6 @@
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from forecast import generate_link, basic_forecast
-from satellite import sat_img, sat_gif2mp4
+from satellite import sat_img, sat_gif2mp4, clean
 import logging, os
 from start_text import start_text
 
@@ -38,12 +38,9 @@ def satellite(update, context):
         sat_img(emphem_city, region_code) 
         sat_gif2mp4()
         context.bot.send_video(chat_id=update.effective_chat.id, video=open('sat.mp4', 'rb'), caption=caption_text)
+        clean()
     except:
         context.bot.send_message(chat_id=update.effective_chat.id, text="Please provide a valid city name.")
-
-
-caps_handler = CommandHandler('title', caps)
-dispatcher.add_handler(caps_handler)
 
 caps_handler = CommandHandler('fc', forecast)
 dispatcher.add_handler(caps_handler)
