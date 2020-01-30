@@ -2,11 +2,6 @@ import requests, json, multiprocessing, time
 
 api_key = 'ujwqfydrabjirpjm'
 
-#file_id = 'AgACAgQAAxkBAAIC3V4yKPk1gmQHHDrh344TEi0XswnfAAJqsTEbqwABkVGTkrOZwNPSv0EWthsABAEAAwIAA3kAA2dlAgABGAQ'
-#bot_token = '965873757:AAGDYWeqXydOHcg8PI-qMK_DSH8ojBJn2-s'
-
-#sub_id = 3213581
-
 def astrometry_login():
     login = requests.post('http://nova.astrometry.net/api/login', data={'request-json': json.dumps({"apikey": api_key})}).json()
     session_id = login["session"]
@@ -77,7 +72,7 @@ def get_ra_dec_tags(job_id):
         radec = requests.post(tags_url).json()
         ra = radec['calibration']['ra']
         dec = radec['calibration']['dec']
-        result_radec_string = ["The center of the image is at:\n ○ RA: {}\n ○ DEC: {}\n".format(ra, dec),'\n' , 'Found the following objects:\n']
+        result_radec_string = ["The center of the image is at:\n ○ RA:  {}\n ○ DEC:  {}\n".format(ra, dec),'\n' , 'Found the following objects:\n']
         return result_radec_string
     except:
         pass 
@@ -99,7 +94,6 @@ def generate_tags_string(job_id):
     mac_tags = list(get_tags_objects(job_id))
     for tag in mac_tags:
         tag_string_lst.append('   ○ ' + tag + '\n')
-    print("".join(tag_string_lst))
     return "".join(tag_string_lst)
 
 def platesolver_results(sub_id):
@@ -117,7 +111,3 @@ def astrometry_job_run(file_id, bot_token):
     session_id = astrometry_login()
     upload(session_id, file_id, bot_token)
     return session_id, sub_id
-
-
-#print(platesolver_results(sub_id), get_jobid(sub_id))
-#print(generate_tags_string(3900643))

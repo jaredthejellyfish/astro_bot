@@ -20,13 +20,16 @@ Welocme to AstroPlan, a bot designed to make you astronomy planning journey esie
 These are the current commands you can currently use: 
 •   /sat (region) (name of city) - Pulls cloud images from a satellite.
 •   /fc (name of city) - Generates a forecast for that city.
+•   /solve - Platesolves a star image.
 '''
+
 
 #City for ephemeris, it sucks.
 emphem_city = 'Barcelona'
 
 #Solving status global var
 solving = 0
+
 
 #Telegram bot token 
 bot_token = '965873757:AAGDYWeqXydOHcg8PI-qMK_DSH8ojBJn2-s'
@@ -38,6 +41,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 #Initialization of the dispatcher
 dispatcher = updater.dispatcher
+
 
 #Bot initialized with /start
 def start(update, context):
@@ -85,42 +89,56 @@ def unknown_command(update, context):
 def not_command(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id, text="My master hasn't taught me how to read normal text, please send a command.")
 
-#Astrometry upload, solving, and result fetching.
+#Astrometry upload, solving, and result fetching asynchronously to not stall the rest.
 @run_async
 def platesolve_image(update, context):
     global solving
+    #Trigger solver if.
     if solving == 1:
         try:
             solving = 0
+            #Pull file id from telegram servers.
             file_id = str(update.message.document.file_id)
+            #Generate "Logged in with id: x & send it."
             login_text = astrometry_job_run(file_id, bot_token)
             context.bot.send_message(chat_id=update.effective_chat.id, text="Loged into nova.strometry.net with session id: {}.".format(login_text[0]))
-            context.bot.send_message(chat_id=update.effective_chat.id, text='File successfully uploaded with job id: {}. \nResults can take up to 5 minutes to appear.'.format(login_text[1]))
+            #Succesful file upload.
+            context.bot.send_message(chat_id=update.effective_chat.id, text='File successfully uploaded with job id: {}. \nResults can take up to 5 minutes to be generated, you can still send any other commands during this time.'.format(login_text[1]))
+            #Pull, format and send astrometry results.
             results = platesolver_results(login_text[1])
             context.bot.send_photo(chat_id=update.effective_chat.id, photo=results[0], caption=results[1])
             print('solver_finished')
         except:
             try:
+                #Pull photo id from telegram servers.
                 photo_id = str(update.message.photo[-1].file_id)
+                #Generate "Logged in with id: x & send it."
                 login_text = astrometry_job_run(photo_id, bot_token)
                 context.bot.send_message(chat_id=update.effective_chat.id, text="Loged into nova.strometry.net with session id: {}.".format(login_text[0]))
-                context.bot.send_message(chat_id=update.effective_chat.id, text='File successfully uploaded with job id: {}. \nResults can take up to 5 minutes be generated.'.format(login_text[1]))
+                #Succesful file upload.
+                context.bot.send_message(chat_id=update.effective_chat.id, text='File successfully uploaded with job id: {}. \nResults can take up to 5 minutes to be generated, you can still send any other commands during this time.'.format(login_text[1]))
+                #Pull, format and send astrometry results.
                 results = platesolver_results(login_text[1])
                 context.bot.send_photo(chat_id=update.effective_chat.id, photo=results[0], caption=results[1])
                 print('solver_finished') 
             except:
+                #Handle oversize exception
                 context.bot.send_message(chat_id=update.effective_chat.id, text="Your file is too large :(")
                 raise
     else:
+        #Handle non-armed platesolver exception.
         context.bot.send_message(chat_id=update.effective_chat.id, text="Send a command before uploading a picture")
     
-
 #Enabler for image detection and upload.
 def platesolve_enable(update, context):
     global solving
-    print("solver armed")
+    #Armed message send.
+    time.sleep(0.2)
+    context.bot.send_message(chat_id=update.effective_chat.id, text="Solver armed, please send an image.")
+    #Arm solver
     solving = 1
     
+
 #Handler for forecast.
 fc_handler = CommandHandler('fc', forecast)
 dispatcher.add_handler(fc_handler)
