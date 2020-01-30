@@ -1,4 +1,4 @@
-import requests, json, time
+import requests, json, multiprocessing, time
 
 api_key = 'ujwqfydrabjirpjm'
 
@@ -38,6 +38,7 @@ def check_status():
     is_finished = False
     status_check_url = 'http://nova.astrometry.net/api/submissions/'+ str(sub_id)
     while is_finished == False:
+        time.sleep(5)
         try:
             out = requests.post(status_check_url).json()
             finished_check = out['job_calibrations']
