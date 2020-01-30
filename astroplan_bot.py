@@ -2,6 +2,9 @@
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from telegram.ext.dispatcher import run_async
 
+#Astronomy
+from astroquery.simbad import Simbad
+
 #Gneral:
 import logging, os, requests, json, time
 
@@ -9,6 +12,7 @@ import logging, os, requests, json, time
 from forecast import generate_link, basic_forecast
 from satellite import sat_img, sat_gif2mp4, clean
 from platesolve import astrometry_job_run, platesolver_results
+from sky_coords import find_object_fname
 
 
 #Initial text for when the bot is initialised with /start
@@ -21,6 +25,8 @@ These are the commands you can currently use:
 •   /sat (region) (name of city) - Pulls cloud images from a satellite.
 •   /fc (name of city) - Generates a forecast for that city.
 •   /solve - Platesolves a star image.
+•   /find (c) - Finds object from name, c flag enables finding through coordinates.
+•   /help - List of all available commands.
 '''
 
 #Text for /help
@@ -29,10 +35,9 @@ These are the commands you can currently use:
 •   /sat (region) (name of city) - Pulls cloud images from a satellite.
 •   /fc (name of city) - Generates a forecast for that city.
 •   /solve - Platesolves a star image.
-•   /coords - Transform between coordinate systems.
+•   /find (c) - Finds object from name, c flag enables finding through coordinates.
 •   /help - List of all available commands.
 '''
-
 
 #City for ephemeris, it sucks.
 emphem_city = 'Barcelona'
@@ -106,10 +111,9 @@ def help(update, context):
 @run_async
 def platesolve_image(update, context):
     global solving
-    #Trigger solver if.
+    #Trigger solver if it is enabled.
     if solving == 1:
         try:
-            solving = 0
             #Pull file id from telegram servers.
             file_id = str(update.message.document.file_id)
             #Generate "Logged in with id: x & send it."
@@ -140,16 +144,42 @@ def platesolve_image(update, context):
                 raise
     else:
         #Handle non-armed platesolver exception.
-        context.bot.send_message(chat_id=update.effective_chat.id, text="Send a command before uploading a picture")
+        context.bot.send_message(chat_id=update.effective_chat.id, text="Enable the solver to read image data.")
     
-#Enabler for image detection and upload.
+#Enable or disable input for image detection and upload.
 def platesolve_enable(update, context):
     global solving
+    enable_flag = ''
+    try:
+        enable_flag = context.args[0].lower()
+    except:
+        context.bot.send_message(chat_id=update.effective_chat.id, text="Please provide the requiered arguments.")
+    if enable_flag == 'enable':
+        solving = 1
+        context.bot.send_message(chat_id=update.effective_chat.id, text="Solver enabled")
+    elif enable_flag == 'disable':
+        solving = 0
+        context.bot.send_message(chat_id=update.effective_chat.id, text="Solver disabled")
     #Armed message send.
     time.sleep(0.2)
-    context.bot.send_message(chat_id=update.effective_chat.id, text="Solver armed, please send an image.")
-    #Arm solver
-    solving = 1
+    
+def find(update, context):
+    try:
+        object_by_coords_flag = context.args[0]
+        if object_by_coords_flag == 'c':
+            print("lookupbycoords")
+            object_name_lst = context.args[1:]
+            #object_name = " ".join(object_name_lst).title()
+            #radec = find_object_fname(object_name)
+            context.bot.send_message(parse_mode='HTML', chat_id=update.effective_chat.id, text=object_name_lst)
+        else:
+            object_name_lst = context.args
+            object_name = " ".join(object_name_lst).title()
+            radec = find_object_fname(object_name)
+            context.bot.send_message(parse_mode='HTML', chat_id=update.effective_chat.id, text=radec)
+    except:
+        context.bot.send_message(chat_id=update.effective_chat.id, text="Please provide the requiered arguments.")
+        exit
     
 
 #Handler for forecast.
@@ -165,8 +195,12 @@ start_handler = CommandHandler('start', start)
 dispatcher.add_handler(start_handler)
 
 #Handler for platesolver.
-solve_handler = CommandHandler('solve', platesolve_enable)
+solve_handler = CommandHandler('solver', platesolve_enable)
 dispatcher.add_handler(solve_handler)
+
+#Handler for ofind.
+find_handler = CommandHandler('find', find)
+dispatcher.add_handler(find_handler)
 
 #Handler for help.
 help_handler = CommandHandler('help', help)
