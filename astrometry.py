@@ -97,7 +97,7 @@ def generate_tags_string(job_id):
     return "".join(tag_string_lst)
 
 def platesolver_results(sub_id):
-    while check_status(sub_id) == False:
+    while check_status(sub_id) == False and check_status(sub_id) != 'failure':
         time.sleep(1)
         print("solving this badboii")
 

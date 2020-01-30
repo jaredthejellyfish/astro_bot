@@ -17,7 +17,15 @@ Hey!
 
 Welocme to AstroPlan, a bot designed to make you astronomy planning journey esier. 
 
-These are the current commands you can currently use: 
+These are the commands you can currently use: 
+•   /sat (region) (name of city) - Pulls cloud images from a satellite.
+•   /fc (name of city) - Generates a forecast for that city.
+•   /solve - Platesolves a star image.
+'''
+
+#Text for /help
+help_text = '''
+These are the commands you can currently use: 
 •   /sat (region) (name of city) - Pulls cloud images from a satellite.
 •   /fc (name of city) - Generates a forecast for that city.
 •   /solve - Platesolves a star image.
@@ -89,6 +97,9 @@ def unknown_command(update, context):
 def not_command(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id, text="My master hasn't taught me how to read normal text, please send a command.")
 
+def help(update, context):
+    context.bot.send_message(chat_id=update.effective_chat.id, text=help_text)
+
 #Astrometry upload, solving, and result fetching asynchronously to not stall the rest.
 @run_async
 def platesolve_image(update, context):
@@ -103,7 +114,7 @@ def platesolve_image(update, context):
             login_text = astrometry_job_run(file_id, bot_token)
             context.bot.send_message(chat_id=update.effective_chat.id, text="Loged into nova.strometry.net with session id: {}.".format(login_text[0]))
             #Succesful file upload.
-            context.bot.send_message(chat_id=update.effective_chat.id, text='File successfully uploaded with job id: {}. \nResults can take up to 5 minutes to be generated, you can still send any other commands during this time.'.format(login_text[1]))
+            context.bot.send_message(chat_id=update.effective_chat.id, text='File successfully uploaded with submission id: {}. \nResults can take up to 5 minutes to be generated, you can still send any other commands during this time.'.format(login_text[1]))
             #Pull, format and send astrometry results.
             results = platesolver_results(login_text[1])
             context.bot.send_photo(chat_id=update.effective_chat.id, photo=results[0], caption=results[1])
@@ -154,6 +165,10 @@ dispatcher.add_handler(start_handler)
 #Handler for platesolver.
 solve_handler = CommandHandler('solve', platesolve_enable)
 dispatcher.add_handler(solve_handler)
+
+#Handler for help.
+help_handler = CommandHandler('help', help)
+dispatcher.add_handler(help_handler)
 
 #Handler for image solving.
 platesolve_image_handler = MessageHandler(Filters.photo | Filters.document, platesolve_image)
