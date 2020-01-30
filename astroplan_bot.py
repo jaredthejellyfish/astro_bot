@@ -29,6 +29,8 @@ These are the commands you can currently use:
 •   /sat (region) (name of city) - Pulls cloud images from a satellite.
 •   /fc (name of city) - Generates a forecast for that city.
 •   /solve - Platesolves a star image.
+•   /coords - Transform between coordinate systems.
+•   /help - List of all available commands.
 '''
 
 
