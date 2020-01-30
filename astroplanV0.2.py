@@ -1,6 +1,8 @@
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+import telegram.ext as telegram
 from forecast import generate_link, basic_forecast
 from satellite import sat_img, sat_gif2mp4, clean
+from astrometry import generate_file_url
 import logging, os
 
 start_text = '''
@@ -16,8 +18,9 @@ These are the current commands you can currently use:
 emphem_city = 'Barcelona'
 
 solving = 0
+bot_token = '965873757:AAGDYWeqXydOHcg8PI-qMK_DSH8ojBJn2-s'
 
-updater = Updater(token='965873757:AAGDYWeqXydOHcg8PI-qMK_DSH8ojBJn2-s', use_context=True)
+updater = Updater(token=bot_token, use_context=True)
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                      level=logging.INFO)
 
@@ -70,24 +73,23 @@ def platesolve_image(update, context):
     global solving
     if solving == 1:
         try:
-            file = context.bot.getFile(update.message.photo[-1].file_id)
-            print ("file_id: " + str(update.message.photo[-1].file_id))
-            file.download('image.jpg')
-            print("photo")
+            file_id = str(update.message.document.file_id)
+            generate_file_url(file_id, bot_token)
         except:
-            file = context.bot.getFile(update.message.document[-1].file_id)
-            file.download('image.fit')
-            print("other")
-            exit
+            pass
+        try:
+            photo_id = str(update.message.photo[-1].file_id)
+            generate_file_url(photo_id, bot_token)
+        except:
+            context.bot.send_message(chat_id=update.effective_chat.id, text="Your file is too large :(")
+            
     else:
         context.bot.send_message(chat_id=update.effective_chat.id, text="Send a command before uploading a picture")
-    
     solving = 0
-    print(solving)
+
 
 def platesolve(update, context):
     global solving
-    print("platesolver engaged")
     solving = 1
     
 
@@ -114,3 +116,7 @@ dispatcher.add_handler(unknown_command_handler)
 
 
 updater.start_polling()
+
+
+#file_id = str(update.message.document.file_id)
+        #print(generate_file_url(file_id, bot_token))
