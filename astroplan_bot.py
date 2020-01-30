@@ -114,7 +114,7 @@ def platesolve_image(update, context):
             file_id = str(update.message.document.file_id)
             #Generate "Logged in with id: x & send it."
             login_text = astrometry_job_run(file_id, bot_token)
-            context.bot.send_message(chat_id=update.effective_chat.id, text="Loged into nova.strometry.net with session id: {}.".format(login_text[0]))
+            context.bot.send_message(chat_id=update.effective_chat.id, text="Loged into nova.astrometry.net with session id: {}.".format(login_text[0]))
             #Succesful file upload.
             context.bot.send_message(chat_id=update.effective_chat.id, text='File successfully uploaded with submission id: {}. \nResults can take up to 5 minutes to be generated, you can still send any other commands during this time.'.format(login_text[1]))
             #Pull, format and send astrometry results.
@@ -127,7 +127,7 @@ def platesolve_image(update, context):
                 photo_id = str(update.message.photo[-1].file_id)
                 #Generate "Logged in with id: x & send it."
                 login_text = astrometry_job_run(photo_id, bot_token)
-                context.bot.send_message(chat_id=update.effective_chat.id, text="Loged into nova.strometry.net with session id: {}.".format(login_text[0]))
+                context.bot.send_message(chat_id=update.effective_chat.id, text="Loged into nova.astrometry.net with session id: {}.".format(login_text[0]))
                 #Succesful file upload.
                 context.bot.send_message(chat_id=update.effective_chat.id, text='File successfully uploaded with job id: {}. \nResults can take up to 5 minutes to be generated, you can still send any other commands during this time.'.format(login_text[1]))
                 #Pull, format and send astrometry results.
