@@ -82,7 +82,6 @@ def platesolve_image(update, context):
         try:
             photo_id = str(update.message.photo[-1].file_id)
             upload(photo_id, bot_token)
-            check_status()
             print(photo_id)
             
         except :

@@ -3,9 +3,9 @@ import requests, json, time
 api_key = 'ujwqfydrabjirpjm'
 
 #file_id = 'AgACAgQAAxkBAAIC3V4yKPk1gmQHHDrh344TEi0XswnfAAJqsTEbqwABkVGTkrOZwNPSv0EWthsABAEAAwIAA3kAA2dlAgABGAQ'
-#bot_token = '965873757:AAGDYWeqXydOHcg8PI-qMK_DSH8ojBJn2-s'
+bot_token = '965873757:AAGDYWeqXydOHcg8PI-qMK_DSH8ojBJn2-s'
 
-sub_id = 0
+sub_id = 3351945
 
 def astrometry_login():
     login = requests.post('http://nova.astrometry.net/api/login', data={'request-json': json.dumps({"apikey": api_key})}).json()
@@ -31,7 +31,7 @@ def upload(file_id, bot_token):
     global sub_id
     session_id = astrometry_login()
     file_url = generate_file_url(file_id, bot_token)
-    out = requests.post('http://nova.astrometry.net/api/url_upload', data={'request-json': json.dumps({"session": session_id, "url": file_url, "scale_units": "degwidth", "scale_lower": 0.5, "scale_upper": 1.0, "center_ra": 290, "center_dec": 11, "radius": 2.0})}).json()
+    out = requests.post('http://nova.astrometry.net/api/url_upload', data={'request-json': json.dumps({"session": session_id, "url": file_url})}).json()
     sub_id = out["subid"]
 
 def check_status():
@@ -46,7 +46,6 @@ def check_status():
             return "Yer fuked"
     except:
         return "Invalid"
-        exit
 
 def get_tags():
     global sub_id
@@ -67,7 +66,7 @@ def generate_tags_string():
     return "".join(tag_string_lst)
 
 
-'''
+
 #upload(photo_id, bot_token)
 is_finished = check_status()
 print(is_finished)
@@ -78,5 +77,3 @@ tags_string = generate_tags_string()
 annotated_url = gnerate_annotated_url()
 
 print(annotated_url, "\n", tags_string)
-
-'''
