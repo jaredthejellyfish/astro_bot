@@ -99,7 +99,7 @@ def generate_tags_string(job_id):
 def platesolver_results(sub_id):
     while check_status(sub_id) == False and check_status(sub_id) != 'failure':
         time.sleep(1)
-        print("solving this badboii")
+        print("Solving image with submission id:", sub_id)
 
     job_id = get_jobid(sub_id)
     annotated_url = gnerate_annotated_url(job_id)
