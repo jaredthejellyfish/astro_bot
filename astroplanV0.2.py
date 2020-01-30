@@ -1,8 +1,8 @@
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
-import telegram.ext as telegram
+from telegram.ext.dispatcher import run_async
 from forecast import generate_link, basic_forecast
 from satellite import sat_img, sat_gif2mp4, clean
-from astrometry import upload, check_status
+from astrometry import astrometry_job_run, platesolver_results
 import logging, os, requests, json, time
 
 #Initial text for when the bot is initialised with /start
@@ -35,29 +35,40 @@ dispatcher = updater.dispatcher
 
 #Bot initialized with /start
 def start(update, context):
+    #Send beginning string.
     context.bot.send_message(chat_id=update.effective_chat.id, text=start_text)
 
 #Generation of forecast url and submission to user.
 def forecast(update, context):
+    #Pull city string from /fc "..."
     usr_city = context.args
     try:
+        #Format string, generate forecast url, send message with image and string as caption.
         stringreturn = "Forecast for {} coming right up!".format(" ".join(usr_city).title())
         url = generate_link(usr_city)
         context.bot.send_photo(chat_id=update.effective_chat.id, photo=url, caption=stringreturn)
     except:
+        #Non valid city name exception
         context.bot.send_message(chat_id=update.effective_chat.id, text="Please provide a valid city name.")
 
 #Generation and upload of Satellite images for user.
 def satellite(update, context):
     try:
+        #Format context (region and user city)
         usr_city = " ".join(context.args[1:])
         region_code = "".join(context.args[0])
+        #Generate caption text.
         caption_text = basic_forecast(usr_city)
+        #Pull satellite image
         sat_img(emphem_city, region_code) 
+        #Convert gif to mp4 with ffmpeg.
         sat_gif2mp4()
+        #Send message with video and forecasted caption
         context.bot.send_video(chat_id=update.effective_chat.id, video=open('sat.mp4', 'rb'), caption=caption_text)
+        #Remove video file from working dir
         clean()
     except:
+        #Invalid city name exception reporting
         context.bot.send_message(chat_id=update.effective_chat.id, text="Please provide a valid city or region name.")
 
 #Unknown command handling.
@@ -69,29 +80,32 @@ def not_command(update, context):
     context.bot.send_message(chat_id=update.effective_chat.id, text="My master hasn't taught me how to read normal text, please send a command.")
 
 #Astrometry upload, solving, and result fetching.
+@run_async
 def platesolve_image(update, context):
     global solving
     if solving == 1:
         try:
             file_id = str(update.message.document.file_id)
-            upload(file_id, bot_token)
-            check_status()
+            login_text = astrometry_job_run(file_id, bot_token)
+            context.bot.send_message(chat_id=update.effective_chat.id, text="Loged into nova.strometry.net with session id: {}.".format(login_text[0]))
+            context.bot.send_message(chat_id=update.effective_chat.id, text='File successfully uploaded with job id: {}. \nResults can take up to 5 minutes to appear.'.format(login_text[1]))
+            results = platesolver_results()
+            context.bot.send_photo(chat_id=update.effective_chat.id, photo=results[0], caption=results[1])
+            print('solver_finished')
         except:
-            pass
+            try:
+                photo_id = str(update.message.photo[-1].file_id)
+                upload(photo_id, bot_token)
+                print(photo_id) 
+            except :
+                context.bot.send_message(chat_id=update.effective_chat.id, text="Your file is too large :(")
 
-        try:
-            photo_id = str(update.message.photo[-1].file_id)
-            upload(photo_id, bot_token)
-            print(photo_id)
-            
-        except :
-            context.bot.send_message(chat_id=update.effective_chat.id, text="Your file is too large :(")
     else:
         context.bot.send_message(chat_id=update.effective_chat.id, text="Send a command before uploading a picture")
     solving = 0
 
 #Enabler for image detection and upload.
-def platesolve(update, context):
+def platesolve_enable(update, context):
     global solving
     solving = 1
     
@@ -108,7 +122,7 @@ start_handler = CommandHandler('start', start)
 dispatcher.add_handler(start_handler)
 
 #Handler for platesolver.
-solve_handler = CommandHandler('solve', platesolve)
+solve_handler = CommandHandler('solve', platesolve_enable)
 dispatcher.add_handler(solve_handler)
 
 #Handler for image solving.
