@@ -8,7 +8,7 @@ import logging, os, requests, json, time
 #Custom functions:
 from forecast import generate_link, basic_forecast
 from satellite import sat_img, sat_gif2mp4, clean
-from astrometry import astrometry_job_run, platesolver_results
+from platesolve import astrometry_job_run, platesolver_results
 
 
 #Initial text for when the bot is initialised with /start
