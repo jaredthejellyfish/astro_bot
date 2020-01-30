@@ -89,7 +89,7 @@ def platesolve_image(update, context):
             login_text = astrometry_job_run(file_id, bot_token)
             context.bot.send_message(chat_id=update.effective_chat.id, text="Loged into nova.strometry.net with session id: {}.".format(login_text[0]))
             context.bot.send_message(chat_id=update.effective_chat.id, text='File successfully uploaded with job id: {}. \nResults can take up to 5 minutes to appear.'.format(login_text[1]))
-            results = platesolver_results()
+            results = platesolver_results(login_text[1])
             context.bot.send_photo(chat_id=update.effective_chat.id, photo=results[0], caption=results[1])
             print('solver_finished')
         except:
