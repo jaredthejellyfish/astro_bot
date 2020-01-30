@@ -1,9 +1,15 @@
+#Bot:
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from telegram.ext.dispatcher import run_async
+
+#Gneral:
+import logging, os, requests, json, time
+
+#Custom functions:
 from forecast import generate_link, basic_forecast
 from satellite import sat_img, sat_gif2mp4, clean
 from astrometry import astrometry_job_run, platesolver_results
-import logging, os, requests, json, time
+
 
 #Initial text for when the bot is initialised with /start
 start_text = '''
@@ -85,6 +91,7 @@ def platesolve_image(update, context):
     global solving
     if solving == 1:
         try:
+            solving = 0
             file_id = str(update.message.document.file_id)
             login_text = astrometry_job_run(file_id, bot_token)
             context.bot.send_message(chat_id=update.effective_chat.id, text="Loged into nova.strometry.net with session id: {}.".format(login_text[0]))
@@ -95,18 +102,23 @@ def platesolve_image(update, context):
         except:
             try:
                 photo_id = str(update.message.photo[-1].file_id)
-                upload(photo_id, bot_token)
-                print(photo_id) 
-            except :
+                login_text = astrometry_job_run(photo_id, bot_token)
+                context.bot.send_message(chat_id=update.effective_chat.id, text="Loged into nova.strometry.net with session id: {}.".format(login_text[0]))
+                context.bot.send_message(chat_id=update.effective_chat.id, text='File successfully uploaded with job id: {}. \nResults can take up to 5 minutes be generated.'.format(login_text[1]))
+                results = platesolver_results(login_text[1])
+                context.bot.send_photo(chat_id=update.effective_chat.id, photo=results[0], caption=results[1])
+                print('solver_finished') 
+            except:
                 context.bot.send_message(chat_id=update.effective_chat.id, text="Your file is too large :(")
-
+                raise
     else:
         context.bot.send_message(chat_id=update.effective_chat.id, text="Send a command before uploading a picture")
-    solving = 0
+    
 
 #Enabler for image detection and upload.
 def platesolve_enable(update, context):
     global solving
+    print("solver armed")
     solving = 1
     
 #Handler for forecast.
