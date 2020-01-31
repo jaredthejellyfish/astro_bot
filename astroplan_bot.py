@@ -81,7 +81,7 @@ def satellite(update, context):
     try:
         #Format context (region and user city)
         usr_city = " ".join(context.args[1:])
-        region_code = "".join(context.args[0])
+        region_code = "".join(context.args[0]).upper()
         #Generate caption text.
         caption_text = basic_forecast(usr_city)
         #Pull satellite image
@@ -168,10 +168,11 @@ def find(update, context):
         object_by_coords_flag = context.args[0]
         if object_by_coords_flag == 'c':
             print("lookupbycoords")
-            object_name_lst = context.args[1:]
+            #object_coords_lst = context.args[1:]
             #object_name = " ".join(object_name_lst).title()
             #radec = find_object_fname(object_name)
-            context.bot.send_message(parse_mode='HTML', chat_id=update.effective_chat.id, text=object_name_lst)
+            #context.bot.send_message(parse_mode='HTML', chat_id=update.effective_chat.id, text=object_coords_lst)
+            context.bot.send_photo(chat_id=update.effective_chat.id, photo='http://nova.astrometry.net/sky_plot/zoom1/2572411', caption=stringreturn)
         else:
             object_name_lst = context.args
             object_name = " ".join(object_name_lst).title()

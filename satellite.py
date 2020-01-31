@@ -1,8 +1,8 @@
 import requests, ephem, os, ffmpy
 
-emphem_city = 'Barcelona'
+#emphem_city = 'Barcelona'
 
-region = 'SP'
+#region = 'SP'
 
 def clean():
     try:

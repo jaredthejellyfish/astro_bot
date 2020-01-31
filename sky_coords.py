@@ -10,3 +10,15 @@ def find_object_fname(object_name):
     except:
         return "Object could not be found."
 
+def find_coords_system(object_coords_lst):
+    if object_coords_lst[0].find(" ") > 0:
+        print('+aa bb cc.ddd, +aa bb cc.ddd')
+    elif object_coords_lst[0].find(":") > 0 and len(object_coords_lst) == 2:
+        print('+aa:bb:cc.ddd, +aa:bb:cc.ddd')
+    elif len(object_coords_lst) == 2 and object_coords_lst[0].find(" ") < 0:
+        print('123.321, 345.543')
+
+
+
+
+
