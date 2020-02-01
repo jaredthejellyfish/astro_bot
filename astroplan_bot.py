@@ -24,8 +24,9 @@ Welocme to AstroPlan, a bot designed to make you astronomy planning journey esie
 These are the commands you can currently use: 
 •   /sat (region) (name of city) - Pulls cloud images from a satellite.
 •   /fc (name of city) - Generates a forecast for that city.
-•   /solve - Platesolves a star image.
+•   /solver - Enables or disables platesolver.
 •   /find - Finds object from name.
+•   /show - Shows SDSS frame for coordinates.
 •   /help - List of all available commands.
 '''
 
@@ -34,8 +35,9 @@ help_text = '''
 These are the commands you can currently use: 
 •   /sat (region) (name of city) - Pulls cloud images from a satellite.
 •   /fc (name of city) - Generates a forecast for that city.
-•   /solve - Platesolves a star image.
-•   /find (c) - Finds object from name, c flag enables finding through coordinates.
+•   /solver - Enables or disables platesolver.
+•   /find - Finds object from name.
+•   /show - Shows SDSS frame for coordinates.
 •   /help - List of all available commands.
 '''
 
