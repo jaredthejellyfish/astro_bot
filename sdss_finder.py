@@ -52,6 +52,4 @@ def show_SDSS_fcoords(obj_coords_lst):
         return True, object_string
     except:
         print("abc")
-        return False, "Coordinates could not be found."
-
-    
+        return False, "Coordinates could not be found."    
