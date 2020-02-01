@@ -1,12 +1,14 @@
 from astroquery.simbad import Simbad
 from astropy import units as u
-from astropy.coordinates import SkyCoord as sc
+from astropy.coordinates import SkyCoord 
 import astropy.coordinates as coord
 from urllib.parse import urlencode
 from urllib.request import urlretrieve
 
-def get_SDDS_image(coords_list):
-    hcg7_center = sc(42.0000*u.deg, 47.1953*u.deg, frame='icrs')
+def get_SDDS_image(coords_deg_lst):
+    ra = float(coords_deg_lst[0])
+    dec = float(coords_deg_lst[1])
+    hcg7_center = SkyCoord(ra*u.deg, dec*u.deg, frame='icrs')
     type(hcg7_center.ra), type(hcg7_center.dec)
     impix = 1080
     imsize = 2*u.deg
@@ -19,14 +21,37 @@ def get_SDDS_image(coords_list):
     # this downloads the image to your disk
     urlretrieve(url, 'SDSS_cutout.jpg')
 
+def convert_to_deg(obj_ra, obj_dec):
+    coords_deg = SkyCoord(str(obj_ra + " " + obj_dec), unit=(u.hourangle, u.deg))
+    coords_deg_ra = round(coords_deg.ra.degree, 4)
+    coords_deg_dec = round(coords_deg.dec.degree, 4)
+    str_list = [str(coords_deg_ra), str(coords_deg_dec)]
+    return str_list
+
 def find_object_coords_fname(object_name):
     result_table = Simbad.query_object(object_name)
     try:
         obj_ra = result_table['RA'][0].replace(" ", ":")
         obj_dec = result_table['DEC'][0].replace(" ", ":")
-        object_at_string = "Object <b>{}</b> is at:\n○ RA:  {} \n○ DEC:  {}".format(object_name, obj_ra, obj_dec)
-        return object_at_string
+        coords = ' '.join(convert_to_deg(obj_ra, obj_dec))
+        get_SDDS_image(convert_to_deg(obj_ra, obj_dec))
+        constellation = coord.get_constellation(SkyCoord(coords, frame='icrs', unit=(u.deg)))
+        object_at_string = "Object <b>{}</b> is at:\n○ RA:  {} \n○ DEC:  {} \n \nIn the constellation of <b>{}</b>.".format(object_name, obj_ra, obj_dec, constellation)
+        return True, object_at_string
     except:
-        return "Object could not be found."
+        return False, "Object could not be found."
 
-get_SDDS_image(1)
+def show_SDSS_fcoords(obj_coords_lst):
+    try:
+        obj_ra = obj_coords_lst[0]
+        obj_dec = obj_coords_lst[1]
+        coords = ' '.join(convert_to_deg(obj_ra, obj_dec))
+        get_SDDS_image(convert_to_deg(obj_ra, obj_dec))
+        constellation = coord.get_constellation(SkyCoord(coords, frame='icrs', unit=(u.deg)))
+        object_string = "Showing <b>DSS</b> image for:\n○ RA:  {} \n○ DEC:  {} \n \nIn the constellation of <b>{}</b>.".format(obj_ra, obj_dec, constellation)
+        return True, object_string
+    except:
+        print("abc")
+        return False, "Coordinates could not be found."
+
+    

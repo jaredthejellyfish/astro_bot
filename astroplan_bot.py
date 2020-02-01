@@ -12,7 +12,7 @@ import logging, os, requests, json, time
 from forecast import generate_link, basic_forecast
 from satellite import sat_img, sat_gif2mp4, clean
 from platesolve import astrometry_job_run, platesolver_results
-from sky_coords import find_object_fname
+from sky_coords import find_object_coords_fname, show_SDSS_fcoords
 
 
 #Initial text for when the bot is initialised with /start
@@ -25,7 +25,7 @@ These are the commands you can currently use:
 •   /sat (region) (name of city) - Pulls cloud images from a satellite.
 •   /fc (name of city) - Generates a forecast for that city.
 •   /solve - Platesolves a star image.
-•   /find (c) - Finds object from name, c flag enables finding through coordinates.
+•   /find - Finds object from name.
 •   /help - List of all available commands.
 '''
 
@@ -162,25 +162,28 @@ def platesolve_enable(update, context):
         context.bot.send_message(chat_id=update.effective_chat.id, text="Solver disabled")
     #Armed message send.
     time.sleep(0.2)
-    
-def find(update, context):
+
+#Find object from name.    
+def find_show(update, context):
     try:
-        object_by_coords_flag = context.args[0]
-        if object_by_coords_flag == 'c':
-            print("lookupbycoords")
-            object_coords_lst = context.args[1:]
-            #object_name = " ".join(object_name_lst).title()
-            #radec = find_object_fname(object_name)
-            context.bot.send_message(parse_mode='HTML', chat_id=update.effective_chat.id, text=object_coords_lst)
-        else:
-            object_name_lst = context.args
-            object_name = " ".join(object_name_lst).title()
-            radec = find_object_fname(object_name)
-            context.bot.send_message(parse_mode='HTML', chat_id=update.effective_chat.id, text=radec)
+        object_name_lst = context.args
+        object_name = " ".join(object_name_lst).title()
+        radec = find_object_coords_fname(object_name)
+        if radec[0] == True:
+            context.bot.send_photo(parse_mode='HTML', chat_id=update.effective_chat.id, photo=open('SDSS_cutout.jpg', 'rb'), caption=radec[1])
+        elif radec[0] == False:
+            context.bot.send_message(chat_id=update.effective_chat.id, text=radec[1])
     except:
         context.bot.send_message(chat_id=update.effective_chat.id, text="Please provide the requiered arguments.")
-        exit
-    
+        
+#Show coordinate region    
+def show(update, context):
+    object_name_lst = context.args
+    showing_str = show_SDSS_fcoords(object_name_lst)
+    if showing_str[0] == True:
+        context.bot.send_photo(parse_mode='HTML', chat_id=update.effective_chat.id, photo=open('SDSS_cutout.jpg', 'rb'), caption=showing_str[1])
+    elif showing_str[0] == False:
+        context.bot.send_message(chat_id=update.effective_chat.id, text=showing_str[1])
 
 #Handler for forecast.
 fc_handler = CommandHandler('fc', forecast)
@@ -199,8 +202,12 @@ solve_handler = CommandHandler('solver', platesolve_enable)
 dispatcher.add_handler(solve_handler)
 
 #Handler for ofind.
-find_handler = CommandHandler('find', find)
+find_handler = CommandHandler('find', find_show)
 dispatcher.add_handler(find_handler)
+
+#Handler for ofind.
+show_handeler = CommandHandler('show', show)
+dispatcher.add_handler(show_handeler)
 
 #Handler for help.
 help_handler = CommandHandler('help', help)
