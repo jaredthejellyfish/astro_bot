@@ -39,10 +39,10 @@ def sat_ir(region):
         f.write(requests.get(uri).content)
 
 def sat_img(emphem_city, region):
-    tod = get_nit_r_day(emphem_city)
-    if tod == 0:
+    tofd = get_nit_r_day(emphem_city)
+    if tofd == 0:
         sat_ir(region)
-    elif tod == 1:
+    elif tofd == 1:
         sat_vis(region)
 
 def sat_gif2mp4():

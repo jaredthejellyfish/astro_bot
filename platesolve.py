@@ -1,4 +1,4 @@
-import requests, json, multiprocessing, time
+import requests, json, time
 
 api_key = 'ujwqfydrabjirpjm'
 
