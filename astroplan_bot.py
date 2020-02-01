@@ -12,7 +12,7 @@ import logging, os, requests, json, time
 from forecast import generate_link, basic_forecast
 from satellite import sat_img, sat_gif2mp4, clean
 from platesolve import astrometry_job_run, platesolver_results
-from sky_coords import find_object_coords_fname, show_SDSS_fcoords
+from sdss_finder import find_object_coords_fname, show_SDSS_fcoords
 
 
 #Initial text for when the bot is initialised with /start
