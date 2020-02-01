@@ -41,6 +41,7 @@ These are the commands you can currently use:
 •   /help - List of all available commands.
 '''
 
+
 #City for ephemeris, it sucks.
 emphem_city = 'Barcelona'
 
@@ -177,6 +178,7 @@ def find_show(update, context):
             context.bot.send_message(chat_id=update.effective_chat.id, text=radec[1])
     except:
         context.bot.send_message(chat_id=update.effective_chat.id, text="Please provide the requiered arguments.")
+    os.remove('SDSS_cutout.jpg')
         
 #Show coordinate region    
 def show(update, context):
@@ -186,6 +188,7 @@ def show(update, context):
         context.bot.send_photo(parse_mode='HTML', chat_id=update.effective_chat.id, photo=open('SDSS_cutout.jpg', 'rb'), caption=showing_str[1])
     elif showing_str[0] == False:
         context.bot.send_message(chat_id=update.effective_chat.id, text=showing_str[1])
+    os.remove('SDSS_cutout.jpg')
 
 #Handler for forecast.
 fc_handler = CommandHandler('fc', forecast)
