@@ -1,4 +1,4 @@
-import requests, ephem, os, ffmpy
+import requests, ephem, os
 
 #emphem_city = 'Barcelona'
 
@@ -47,6 +47,6 @@ def sat_img(emphem_city, region):
 
 def sat_gif2mp4():
     os.system('ffmpeg -hide_banner -loglevel panic -r 5 -i sat.gif -movflags faststart -pix_fmt yuv420p -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" sat.mp4 -y')
-    os.remove('sat.gif')
+    #os.remove('sat.gif')
 
 clean()
