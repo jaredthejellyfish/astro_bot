@@ -11,7 +11,7 @@ def get_file_path(file_id, bot_token):
     url_file_path = 'https://api.telegram.org/bot{}/getFile?file_id={}'.format(bot_token, file_id)
     response = requests.get(url_file_path).json()['result']['file_path']
     if response == None:
-        print('we fucked up chief')
+        #print('we fucked up chief')
         exit
     else:
         return response
@@ -19,7 +19,7 @@ def get_file_path(file_id, bot_token):
 def generate_file_url(file_id, bot_token):
     file_path = get_file_path(file_id, bot_token)
     url = 'https://api.telegram.org/file/bot{}/{}'.format(bot_token, file_path)
-    print(url)
+    #print(url)
     return url
 
 def upload(session_id, file_id, bot_token):
@@ -56,13 +56,13 @@ def check_status(sub_id):
             if finished_check == 'success':
                 is_finished = True
             elif finished_check == 'failure':
-                print("solve failed")
+                #print("solve failed")
                 return "failed"
             else:
                 is_finished = False
                 break
         except:
-            print("failed")
+            #print("failed")
             break
     return is_finished
 
@@ -99,7 +99,7 @@ def generate_tags_string(job_id):
 def platesolver_results(sub_id):
     while check_status(sub_id) == False and check_status(sub_id) != 'failure':
         time.sleep(1)
-        print("Solving image with submission id:", sub_id)
+        #print("Solving image with submission id:", sub_id)
 
     job_id = get_jobid(sub_id)
     annotated_url = gnerate_annotated_url(job_id)

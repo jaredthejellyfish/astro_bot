@@ -127,7 +127,6 @@ def platesolve_image(update, context):
             #Pull, format and send astrometry results.
             results = platesolver_results(login_text[1])
             context.bot.send_photo(chat_id=update.effective_chat.id, photo=results[0], caption=results[1])
-            print('solver_finished')
         except:
             try:
                 #Pull photo id from telegram servers.
@@ -140,7 +139,6 @@ def platesolve_image(update, context):
                 #Pull, format and send astrometry results.
                 results = platesolver_results(login_text[1])
                 context.bot.send_photo(chat_id=update.effective_chat.id, photo=results[0], caption=results[1])
-                print('solver_finished') 
             except:
                 #Handle oversize exception
                 context.bot.send_message(chat_id=update.effective_chat.id, text="Your file is too large :(")

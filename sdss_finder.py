@@ -52,5 +52,5 @@ def show_SDSS_fcoords(obj_coords_lst):
         object_string = "Showing <b>DSS</b> image for:\n○ RA:  {} \n○ DEC:  {} \n \nIn the constellation of <b>{}</b>.".format(obj_ra, obj_dec, constellation)
         return True, object_string
     except:
-        print("abc")
+        #print("abc")
         return False, "Coordinates could not be found."    
