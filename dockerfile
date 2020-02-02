@@ -1,5 +1,5 @@
-FROM python:alpine
+FROM python:3.8-buster
 COPY . /app
 WORKDIR /app
 RUN pip install -r requirements.txt
-CMD python ./astroplan_bot
+CMD python ./astroplan_bot.py
