@@ -10,13 +10,14 @@ def get_SDDS_image(coords_deg_lst):
     dec = float(coords_deg_lst[1])
     hcg7_center = SkyCoord(ra*u.deg, dec*u.deg, frame='icrs')
     type(hcg7_center.ra), type(hcg7_center.dec)
-    impix = 1080
-    imsize = 2*u.deg
+    impix_w = 1657
+    impix_h = 1129
+    imsize = 1.2*u.deg
     cutoutbaseurl = 'http://skyservice.pha.jhu.edu/DR12/ImgCutout/getjpeg.aspx'
     query_string = urlencode(dict(ra=hcg7_center.ra.deg, 
                                      dec=hcg7_center.dec.deg, 
-                                     width=impix, height=impix, 
-                                     scale=imsize.to(u.arcsec).value/impix))
+                                     width=impix_w, height=impix_h, 
+                                     scale=imsize.to(u.arcsec).value/impix_w))
     url = cutoutbaseurl + '?' + query_string
     # this downloads the image to your disk
     urlretrieve(url, 'SDSS_cutout.jpg')
