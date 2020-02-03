@@ -3,6 +3,6 @@ Astrobot is an open source Telegram bot designed to aid with mundane astrophotog
 It is based on the telegram.ext python module.
 
 **Next steps:**
-- [ ] https://skyview.gsfc.nasa.gov
-- [ ] Comment all subfiles.
+- [x] https://skyview.gsfc.nasa.gov
+- [x] Comment all subfiles.
 - [ ] Figure out how to get DSS files directly.
