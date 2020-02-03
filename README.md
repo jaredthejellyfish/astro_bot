@@ -6,3 +6,5 @@ It is based on the telegram.ext python module.
 - [x] https://skyview.gsfc.nasa.gov
 - [x] Comment all subfiles.
 - [ ] Figure out how to get DSS files directly.
+
+![Docker Image CI](https://github.com/domesticmexican/astro_bot/workflows/Docker%20Image%20CI/badge.svg)
