@@ -1,9 +1,6 @@
 import requests, ephem, os
 
-#emphem_city = 'Barcelona'
-
-#region = 'SP'
-
+#Clear working directory of any video or gif files.
 def clean():
     try:
         os.remove('sat.mp4')
@@ -11,6 +8,7 @@ def clean():
     except:
         return "Neat dirs."
 
+#Check if it's night or day.
 def get_nit_r_day(emphem_city):
     #Generate observer object with location
     observer = ephem.city(emphem_city)
@@ -24,6 +22,7 @@ def get_nit_r_day(emphem_city):
     else:
         return False
 
+#Pull visual band gif.
 def sat_vis(region):
     #Pull visual light gif from Sat24
     uri = '''https://api.sat24.com/animated/{}/visual/1/width=400%20height=291'''.format(region)
@@ -31,6 +30,7 @@ def sat_vis(region):
     with open('sat.gif', 'wb') as f:
         f.write(requests.get(uri).content)
 
+#Pull ir band gif.
 def sat_ir(region):
     #Pull IR gif from Sat24
     uri = '''https://api.sat24.com/animated/{}/infraPolair/1/width=800%20height=582'''.format(region)
@@ -38,6 +38,7 @@ def sat_ir(region):
     with open('sat.gif', 'wb') as f:
         f.write(requests.get(uri).content)
 
+#Select satellite band according to the time of day.
 def sat_img(emphem_city, region):
     tofd = get_nit_r_day(emphem_city)
     if tofd == 0:
@@ -45,8 +46,9 @@ def sat_img(emphem_city, region):
     elif tofd == 1:
         sat_vis(region)
 
+#Convert gif to mp4 file.
 def sat_gif2mp4():
     os.system('ffmpeg -hide_banner -loglevel panic -r 5 -i sat.gif -movflags faststart -pix_fmt yuv420p -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" sat.mp4 -y')
-    #os.remove('sat.gif')
 
+#Pre-clear directory to avoid junk files.
 clean()
