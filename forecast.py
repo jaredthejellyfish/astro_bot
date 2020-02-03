@@ -8,6 +8,7 @@ geopy.geocoders.options.default_ssl_context = ctx
 #OpenWeatherMaps API key
 owm = pyowm.OWM('79f7a1995bb5c8006f7f6ce7c542ce51')
 
+#Get basic 3h data from Open Weather Maps
 def basic_forecast_unform(usr_city):
     #Current forecast.
     loc = owm.weather_at_place(usr_city)
@@ -29,8 +30,11 @@ def basic_forecast_unform(usr_city):
     #Return all collected values.
     return rain, clouds, temperature, humidity, wind_speed
 
+#Gnerate simple forecast fro satellite.py images.
 def basic_forecast(usr_city):
+    #Get unformatted forecast from Open Weather Maps
     unf_forecasting = basic_forecast_unform(usr_city)
+    #Conditionals to determine what message to send.
     if unf_forecasting[0] == True:
         return "Damn, it looks like there is gonna be some rain. I wouldn't recommend bringing out your telescope tonight."
     elif unf_forecasting[1] == True:
@@ -40,14 +44,20 @@ def basic_forecast(usr_city):
     else:
         return "All clear! Looks like you'll be having some fun :)."
 
+#Get coordinates from city input
 def generate_coords(usr_city):
+    #Log into nominatim (location database)
     geolocator = Nominatim(user_agent='domesticmexican')
+    #Initialize location object with user input city as parameter
     location = geolocator.geocode(usr_city)
+    #Get coordinates
     city_lat = round(location.latitude, 2)
     city_lon = round(location.longitude, 2)
     return city_lat, city_lon
 
 def generate_link(usr_city):
+    #Get lat and lon from Nominatim
     coords = generate_coords(usr_city)
+    #Generate link with formatted coordinates for clearoutside.
     link = 'https://clearoutside.com/forecast_image_large/{}/{}/forecast.png'.format(coords[0], coords[1])
     return link
