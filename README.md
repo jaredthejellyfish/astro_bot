@@ -6,5 +6,4 @@ It is based on the telegram.ext python module.
 - [x] https://skyview.gsfc.nasa.gov
 - [x] Comment all subfiles.
 - [ ] Figure out how to get DSS files directly.
-- [ ] Configure docker autobuild on docker hub
-
+- [x] Configure docker autobuild on docker hub
