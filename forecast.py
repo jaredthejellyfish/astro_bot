@@ -1,18 +1,22 @@
-import pyowm, requests
-from geopy.geocoders import Nominatim
-import certifi, ssl, geopy.geocoders
+from pygeocoder import Geocoder
+import pyowm
+import requests
+import configparser
 
-ctx = ssl.create_default_context(cafile=certifi.where())
-geopy.geocoders.options.default_ssl_context = ctx
+class Forecast:
+    def __init__(self):
+        config = configparser.ConfigParser()
+        config.read('config.ini')
 
-#OpenWeatherMaps API key
-owm = pyowm.OWM('79f7a1995bb5c8006f7f6ce7c542ce51')
+        gc_key = config['API_KEYS']['geocoder']
+        owm_key = config['API_KEYS']['owm']
 
+        self.gc = Geocoder(gc_key)
+        self.owm = pyowm.OWM(owm_key)
 
+    def generate_link(self, lat, lon):
+        #Generate link with formatted coordinates for clearoutside.
+        link = 'https://clearoutside.com/forecast_image_large/{}/{}/forecast.png'.format(lat, lon)
+        return link
 
-
-def generate_link(lat, lon):
-    #Generate link with formatted coordinates for clearoutside.
-    link = 'https://clearoutside.com/forecast_image_large/{}/{}/forecast.png'.format(lat, lon)
-    return link
-
+   
