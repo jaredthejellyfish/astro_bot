@@ -1,19 +1,25 @@
-import requests
-from urllib.request import urlopen
-import json
-from pygeocoder import Geocoder
 import configparser
-import pyowm
+import requests
 import time
+
+from pygeocoder import Geocoder
+import pyowm
+
+
 
 class Satellite:
     def __init__(self):
+        # Read OpenWeatherMaps and Gogle Geocoding API_KEYS from 'config.ini'
         config = configparser.ConfigParser()
         config.read('config.ini')
         gc_key = config['API_KEYS']['geocoder']
         owm_key = config['API_KEYS']['owm']
+
+        # Create owm and geoc objects and assign them to self.
         self.owm = pyowm.OWM(owm_key)
-        self.gc = Geocoder(gc_key)
+        self.geoc = Geocoder(gc_key)
+
+        # Country codes dicionary for SAT24
         self.country_codes = {'Germany':'DE', 
                  'Spain':'SP', 
                  'France':'FR', 
@@ -31,58 +37,82 @@ class Satellite:
                  'United Kingdom':'UK'
                 }
 
+
     def get_country_code(self, lat, lon):
-        results = self.gc.reverse_geocode(lat, lon)
+        # Get country name by reverse geocoding
+        results = self.geoc.reverse_geocode(lat, lon)
         country = results.country
+
+        # Match country name to country code from COUNTRY_CODES
         if country and country in self.country_codes.keys():
             return self.country_codes[country]
 
-    def down_sat_vis(self, lat, lon, chat_id='test_satellite_image'):
-        country_code = self.get_country_code(lat, lon)
-        if country_code:
-            uri = 'https://api.sat24.com/animated/{}/visual/1/Romance%20Standard%20Time/2964777'.format(country_code)
-            with open('{}.gif'.format(chat_id), 'wb') as f:
-                f.write(requests.get(uri).content)
-            return True
-        else:
-            return False
 
-    def down_sat_ir(self, lat, lon, chat_id='test_satellite_image'):
+    def down_sat(self, lat, lon, freq, chat_id='test_satellite_image'):
+        # Get country code using .get_country_code() method
         country_code = self.get_country_code(lat, lon)
+
+        # Download current SAT24 image and wite it to temp file named CHAT_ID
         if country_code:
-            uri = 'https://api.sat24.com/animated/{}/infraPolair/1/Romance%20Standard%20Time/2964777'.format(country_code)
-            with open('{}.gif'.format(chat_id), 'wb') as f:
-                f.write(requests.get(uri).content)
-            return True
+            try:
+                # Form URL using passed in details (COUNTRY_CODE, FREQ)
+                uri = 'https://api.sat24.com/animated/{}/{}/1/Romance%20Standard%20Time/'.format(country_code, freq)
+                # Download file from URL and name it CHAT_ID
+                with open('{}.gif'.format(chat_id), 'wb') as f:
+                    f.write(requests.get(uri).content)
+            except:
+                # Set ERROR flag in case of failure to download file from SAT24
+                return True
         else:
-            return False
+            # Retrun ERROR flag in case of no country code having been generated
+            return True
+
 
     def get_sat(self, lat, lon, chat_id='test_satellite_image'):
+        # Get day sat image from .down_sat() method
         if self.day_or_night(lat, lon) == True:
-            status = self.down_sat_vis(lat, lon, chat_id)
+            # Set ERROR flag accordingly to .down_sat() output
+            error = self.down_sat(lat, lon, 'visual', chat_id)
+            # Get forecast text from .sat_fc()
             fc = self.sat_fc(lat, lon)
-            return status, fc
+            return error, fc
 
-        if self.day_or_night(lat, lon) == False:
-            status = self.down_sat_ir(lat, lon, chat_id)
+        # Get night sat image from .down_sat() method
+        elif self.day_or_night(lat, lon) == False:
+            # Set ERROR flag accordingly to .down_sat() output
+            error = self.down_sat(lat, lon, 'infraPolair', chat_id)
+            # Get forecast text from .sat_fc()
             fc = self.sat_fc(lat, lon)
-            return status, fc
+            return error, fc
+
+        # Set ERROR flag if no time of day could be selected
+        else:
+            return True, '0'
 
     def day_or_night(self, lat, lon):
-        results = self.gc.reverse_geocode(lat, lon)
+        # Use reverse geolocation to find name of nearest city
+        results = self.geoc.reverse_geocode(lat, lon)
         city = results.city
+
+        # Use owm object to get weather for the nearest city
         city = self.owm.weather_at_place(city)
         weather = city.get_weather()
+
+        # Return TRUE if time.time() is between SUNSIE and SUNSET (daytime) 
         if int(time.time()) > weather.get_sunrise_time(timeformat='unix') and int(time.time()) < weather.get_sunset_time(timeformat='unix'):
             return True
-        elif int(time.time()) > weather.get_sunrise_time(timeformat='unix') and int(time.time()) > weather.get_sunset_time(timeformat='unix'):
+        else:
             return False
 
     def get_3h_forecast(self, lat, lon):
-        results = self.gc.reverse_geocode(lat, lon)
+        # Use reverse geolocation to find name of nearest city
+        results = self.geoc.reverse_geocode(lat, lon)
         usr_city = results.city
+
+        # Use owm object to get weather for the nearest city
         loc = self.owm.weather_at_place(usr_city)
         weather = loc.get_weather()
+
         #Temperature 
         temperature = weather.get_temperature('celsius')['temp']
         #Humidity
@@ -95,12 +125,14 @@ class Satellite:
         rain = three_hour_forecast.will_have_rain()
         #Are clouds gonna roll in?
         clouds = three_hour_forecast.will_have_clouds()
-        #Return all collected values.
+
         return rain, clouds, temperature, humidity, wind
 
     def sat_fc(self, lat, lon):
+        # Get forecasted values from .get_3h_forecast() method
         rain, clouds, temperature, humidity, wind = self.get_3h_forecast(lat, lon)
-        #fc = 'Looks like it will {}. The current temperature is {}ºC and the humidity is {}%. {}, the wind speed is {}.'
+
+        # Form forecast string to be returned to the user, variable values are bolded in HTML (<b>{}</b>)
         fc = 'Looks like it will '
         if rain == True:
             fc += 'rain.\n'
@@ -108,7 +140,9 @@ class Satellite:
             fc += 'be cloudy.\n'
         else:
             fc += 'be clear!\n'
-        fc += 'The current themperature is {}ºC and the humidity is {}%.\n'.format(temperature, humidity)
+        fc += 'The current themperature is <b>{}ºC</b> and the humidity is <b>{}%</b>.\n'.format(temperature, humidity)
         if wind['speed'] > 5:
-            fc += 'There might be some shaking caused by the wind, the current wind speed is {}m/s and the heading is {}º.'.format(wind['speed'], wind['deg'])
+            fc += 'There might be some shaking caused by the wind, the current wind speed is <b>{}m/s</b> and its heading is <b>{}º</b>.'.format(wind['speed'], wind['deg'])
+        else:
+            fc += 'There shouldn\'t be much shaking caused by the wind, the current wind speed is <b>{}m/s</b> and its heading is <b>{}º</b>.'.format(wind['speed'], wind['deg'])
         return fc
