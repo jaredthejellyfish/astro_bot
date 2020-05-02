@@ -1,14 +1,5 @@
-from time import sleep
+string = 'File being solved with job id: {} \nSolving.'
 
-def ello(bruv):
-    i = 0
-    while True:
-        print(bruv)
-        i +=1
-        sleep(1)
-        if i == 10:
-            return True
-
-
-if ello('bruv'):
-    print(' Funk')
+for i in range(10):
+    print(string)
+    string += '.'
