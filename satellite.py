@@ -7,7 +7,6 @@ from pygeocoder import Geocoder
 import pyowm
 
 
-
 class Satellite:
     def __init__(self):
         # Read OpenWeatherMaps and Gogle Geocoding API_KEYS from 'config.ini'
@@ -71,7 +70,7 @@ class Satellite:
 
     def get_sat(self, lat, lon, chat_id='test_satellite_image'):
         # Get DAY sat image from .down_sat() method
-        if self.day_or_night(lat, lon) == True and self.get_forecast(lat, lon)[0] is False:
+        if self.day_or_night(lat, lon) == True:
             # Set ERROR flag accordingly to .down_sat() output
             error = self.down_sat(lat, lon, 'visual', chat_id)
             # Get forecast text from .sat_fc()
@@ -79,22 +78,13 @@ class Satellite:
             return error, fc
 
         # Get NIGHT sat image from .down_sat() method
-        elif self.day_or_night(lat, lon) == False and self.get_forecast(lat, lon)[0] is False:
+        elif self.day_or_night(lat, lon) == False:
             # Set ERROR flag accordingly to .down_sat() output
             error = self.down_sat(lat, lon, 'infraPolair', chat_id)
             # Get forecast text from .sat_fc()
             fc = self.sat_fc(lat, lon)
             return error, fc
 
-        # Get RAIN sat image from .down_sat() method
-        elif self.get_forecast(lat, lon)[0] is True:
-            # Set ERROR flag accordingly to .down_sat() output
-            error = self.down_sat(lat, lon, 'rainTMC', chat_id)
-            # Get forecast text from .sat_fc()
-            fc = self.sat_fc(lat, lon)
-            return error, fc
-
-        # Set ERROR flag if no time of day could be selected
         else:
             return True, '0'
 
@@ -119,7 +109,7 @@ class Satellite:
         # Use reverse geolocation to find name of nearest city
         results = self.geoc.reverse_geocode(lat, lon)
         usr_city = results.city
-
+        print(usr_city)
         # Use owm object to get weather for the nearest city
         loc = self.owm.weather_at_place(usr_city)
         weather = loc.get_weather()
@@ -150,13 +140,17 @@ class Satellite:
             fc += 'rain.\n'
         if clouds == True and rain == False:
             fc += 'be cloudy.\n'
-        else:
+        elif rain is not True and clouds is not False:
             fc += 'be clear!\n'
         fc += 'The current themperature is <b>{}ºC</b> and the humidity is <b>{}%</b>.\n'.format(temperature, humidity)
-        if wind['speed'] > 5:
-            fc += 'There might be some shaking caused by the wind, the current wind speed is <b>{}m/s</b> and its heading is <b>{}º</b>.'.format(wind['speed'], wind['deg'])
+        if 'deg' in wind.keys():
+            if wind['speed'] > 5:
+                fc += 'There might be some shaking caused by the wind, the current wind speed is <b>{}m/s</b> and its heading is <b>{}º</b>.'.format(wind['speed'], wind['deg'])
+            else:
+                fc += 'There shouldn\'t be much shaking caused by the wind, the current wind speed is <b>{}m/s</b> and its heading is <b>{}º</b>.'.format(wind['speed'], wind['deg'])
         else:
-            fc += 'There shouldn\'t be much shaking caused by the wind, the current wind speed is <b>{}m/s</b> and its heading is <b>{}º</b>.'.format(wind['speed'], wind['deg'])
+            fc += 'Looks like there is no wind.'
+
         return fc
 
 
