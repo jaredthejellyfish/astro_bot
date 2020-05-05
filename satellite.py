@@ -69,8 +69,11 @@ class Satellite:
 
 
     def get_sat(self, lat, lon, chat_id='test_satellite_image'):
+        # Gets time of day from .day_or_night()
+        time_od = self.day_or_night(lat, lon)
+
         # Get DAY sat image from .down_sat() method
-        if self.day_or_night(lat, lon) == True:
+        if time_od == True:
             # Set ERROR flag accordingly to .down_sat() output
             error = self.down_sat(lat, lon, 'visual', chat_id)
             # Get forecast text from .sat_fc()
@@ -78,7 +81,7 @@ class Satellite:
             return error, fc
 
         # Get NIGHT sat image from .down_sat() method
-        elif self.day_or_night(lat, lon) == False:
+        elif time_od == False:
             # Set ERROR flag accordingly to .down_sat() output
             error = self.down_sat(lat, lon, 'infraPolair', chat_id)
             # Get forecast text from .sat_fc()

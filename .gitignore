@@ -3,3 +3,4 @@ __pycache__
 dev.py
 test_satellite_image.gif
 done
+.vscode

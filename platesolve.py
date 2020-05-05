@@ -89,6 +89,7 @@ class Platesolver:
         # Query nova.astrometry.net/api/jobs/JOBID/info/
         tags_url = 'http://nova.astrometry.net/api/jobs/'+ str(self.job_id) +'/info/'
         try:
+            time.sleep(1)
             # Extract RA & DEC fields
             radec = requests.post(tags_url).json()
             ra = radec['calibration']['ra']
@@ -105,7 +106,6 @@ class Platesolver:
             # Extract tags fields
             tags = requests.post(tags_url).json()
             self.mac_tags = tags['tags']
-            print(self.mac_tags)
         except:
             return None
 

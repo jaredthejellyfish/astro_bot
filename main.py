@@ -63,16 +63,42 @@ def platesolve_image(update, context):
         running_solver[chat_id] = pl
         if pl.platesolve(file_id, context, update) is False:
             try:
-                del running_solver[chat_id]
+                running_solver.pop(chat_id)
             except KeyError:
                 print("Key {} not found".format(chat_id))
     else:
         context.bot.send_message(chat_id=chat_id, text= 'The solver is already running, I can only handle one image per user.')
-    
+
+@run_async
+def start(update, context):
+    chat_id = update.message.chat_id
+    location_keyboard = telegram.KeyboardButton(text="Send my location!", request_location=True)
+    custom_keyboard = [[location_keyboard]]
+    reply_markup = telegram.ReplyKeyboardMarkup(custom_keyboard)
+    context.bot.send_message(chat_id=chat_id, 
+                    text="Welocme to AstroPlan! \nA bot designed to make you astronomy planning journey esier.", 
+                    reply_markup=reply_markup)
+
+@run_async
+def location(update, context):
+    chat_id = update.message.chat_id
+    user_location = update.message.location
+    custom_keyboard = [['Satellite Image', 'Forecast'], 
+                       ['Find Object', 'Show Coordinates'],
+                       ['Settings']]
+    reply_markup = telegram.ReplyKeyboardMarkup(custom_keyboard)
+    context.bot.send_message(chat_id=chat_id, 
+                    text="Awesome! Thanks :)", 
+                    reply_markup=reply_markup)
 
 image_platesolve_handler = MessageHandler(Filters.photo, platesolve_image)
 dispatcher.add_handler(image_platesolve_handler)    
-    
+
+start_handler = CommandHandler('start', start)
+dispatcher.add_handler(start_handler)
+
+location_handler = MessageHandler(Filters.location, location)
+dispatcher.add_handler(location_handler)
 
 plain_text_handler = MessageHandler(Filters.text, manage_bot)
 dispatcher.add_handler(plain_text_handler)
