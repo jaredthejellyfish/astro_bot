@@ -6,3 +6,5 @@ done
 .vscode
 .DS_Store
 *.code-workspace
+TODO
+users.db
