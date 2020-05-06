@@ -47,6 +47,17 @@ class AstroBot:
         clo_url, text = fc.get_fc(lat, lon)
         context.bot.sendPhoto(chat_id=self.chat_id, photo=clo_url, caption=text)
 
+    def find_object(self, update, context):
+        pass
+
+    def show_coordinates(self, update, context):
+        pass
+
+    def gage_intent(self, update, context):
+        pass
+
+    def store_location(self, lat, lon, chat_id):
+        pass
 
 @run_async
 def manage_bot(update, context):

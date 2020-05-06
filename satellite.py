@@ -112,7 +112,7 @@ class Satellite:
         # Use reverse geolocation to find name of nearest city
         results = self.geoc.reverse_geocode(lat, lon)
         usr_city = results.city
-        print(usr_city)
+        
         # Use owm object to get weather for the nearest city
         loc = self.owm.weather_at_place(usr_city)
         weather = loc.get_weather()

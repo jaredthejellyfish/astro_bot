@@ -69,7 +69,11 @@ class Platesolver:
 
         # Get nova.astrometry.net/api/jobs/ JSON query
         status_check_url = 'http://nova.astrometry.net/api/jobs/'+ str(self.job_id)
-        while True:
+
+        # Status definition
+        status = None
+
+        while status == 'solving' or status == None:
             try:
                 out = requests.post(status_check_url).json()
                 # Save the status field into a variable
@@ -80,10 +84,9 @@ class Platesolver:
                     break
                 elif status == 'failure':
                     return True
-                else:
-                    break
+
             except:
-                break
+                self.check_status(context, update)
 
     def get_ra_dec_tags(self):
         # Query nova.astrometry.net/api/jobs/JOBID/info/
@@ -125,6 +128,7 @@ class Platesolver:
     def send_messages(self, context, update, error=False):
         if error is True:
             context.bot.send_message(chat_id=self.chat_id, text= 'Looks like I failed to solve your image, please try again.')
+            return
         
         context.bot.edit_message_text(chat_id=self.chat_id, message_id=self.status_message.message_id, text='File solved! Here are your results:')
         context.bot.send_photo(chat_id=update.effective_chat.id, 
