@@ -66,6 +66,18 @@ class AstroBot:
                     return
                 self.clo_forecast(update, context)
 
+            if update.message.text == 'Find Object':
+                if self.get_location():
+                    self.askfor_location(update, context)
+                    return
+                self.find_object(update, context)
+
+            if update.message.text == 'Show Coordinates':
+                if self.get_location():
+                    self.askfor_location(update, context)
+                    return
+                self.show_coordinates(update, context)
+
     def get_location(self):
         db = Database()
         stat = db.get_user(self.chat_id)
