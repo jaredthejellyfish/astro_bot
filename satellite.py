@@ -100,11 +100,11 @@ class Satellite:
     def day_or_night(self, lat, lon):
         # Use reverse geolocation to find name of nearest city
         results = self.geoc.reverse_geocode(lat, lon)
-        city = results.city
+        self.city = results.city
 
         try:
             # Use owm object to get weather for the nearest city
-            city = self.owm.weather_at_place(city)
+            city = self.owm.weather_at_place(self.city)
             weather = city.get_weather()
         except:
             return None
@@ -148,12 +148,16 @@ class Satellite:
         # Form forecast string to be returned to the user, variable values are bolded in HTML (<b>{}</b>)
         fc = 'Looks like it will '
         if rain == True:
-            fc += 'rain.\n'
+            fc += 'rain in {}.\n'.format(self.city)
+
         if clouds == True and rain == False:
-            fc += 'be cloudy.\n'
+            fc += 'be cloudy in {}.\n'.format(self.city)
+
         elif rain is not True and clouds is not False:
-            fc += 'be clear!\n'
+            fc += 'be clear in {}!\n'.format(self.city)
+
         fc += 'The current themperature is <b>{}ºC</b> and the humidity is <b>{}%</b>.\n'.format(temperature, humidity)
+        
         if 'deg' in wind.keys():
             if wind['speed'] > 5:
                 fc += 'There might be some shaking caused by the wind, the current wind speed is <b>{}m/s</b> and its heading is <b>{}º</b>.'.format(wind['speed'], wind['deg'])

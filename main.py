@@ -1,6 +1,7 @@
 from forecast import Forecast
 from satellite import Satellite
 from platesolve import Platesolver
+from db_man import Database
 
 import telegram
 from telegram.ext import CallbackQueryHandler, CommandHandler, Filters, MessageHandler, Updater, dispatcher, run_async
@@ -18,23 +19,16 @@ updater = Updater(token=telegram_token, use_context=True)
 
 dispatcher = updater.dispatcher
 
-lat, lon = 41.28610, 1.98241
-
 sat = Satellite()
 fc = Forecast()
 
 running_solver = {}
 running_bot = {}
 
-
-
-
-
 class AstroBot:
     def __init__(self, chat_id):
         self.chat_id = chat_id
-        self.db = {}
-        self.update_coords()
+        self.get_location()
 
     def sat_gif(self, update, context):
         ready_message = context.bot.send_message(chat_id=self.chat_id, text= 'Getting your forecast ready...')
@@ -60,24 +54,29 @@ class AstroBot:
         pass
 
     def gage_intent(self, update, context):
-        if update.message.text == 'Satellite Forecast':
-            self.update_coords()
-            self.sat_gif(update, context)
+            if update.message.text == 'Satellite Forecast':
+                if self.get_location():
+                    self.askfor_location(update, context)
+                    return
+                self.sat_gif(update, context)
 
-        if update.message.text == 'Clearoutside Forecast':
-            self.update_coords()
-            self.clo_forecast(update, context)
+            if update.message.text == 'Clearoutside Forecast':
+                if self.get_location():
+                    self.askfor_location(update, context)
+                    return
+                self.clo_forecast(update, context)
 
-    def update_coords(self):
-        self.lat = lat
-        self.lon = lon
+    def get_location(self):
+        db = Database()
+        stat = db.get_user(self.chat_id)
+        del db
+        if stat is not True:
+            self.lat, self.lon, self.time = stat
+        else:
+            return True
 
-    def store_location(self, lat, lon, chat_id):
-        pass
-
-
-
-
+    def askfor_location(self, update, context):
+        context.bot.send_message(chat_id=self.chat_id, text= 'Looks like I don\'t have your location. \nCould you tap the Update Location button?')
 
 @run_async
 def manage_bot(update, context):
@@ -113,6 +112,7 @@ def platesolve_image(update, context):
 @run_async
 def start(update, context):
     chat_id = update.message.chat_id
+
     location_keyboard = telegram.KeyboardButton(text="Send my location!", request_location=True)
     custom_keyboard = [[location_keyboard]]
     reply_markup = telegram.ReplyKeyboardMarkup(custom_keyboard)
@@ -122,22 +122,23 @@ def start(update, context):
 
 @run_async
 def location(update, context):
-    global lat, lon
     chat_id = update.message.chat_id
+
     user_location = update.message.location
     lat = round(user_location.latitude, 5)
     lon = round(user_location.longitude,5)
+    db = Database()
+    db.upd_user(chat_id, lat, lon)
+    del db
+
+    loc_button = telegram.KeyboardButton(text="Update Location", request_location=True)
     custom_keyboard = [['Satellite Forecast', 'Clearoutside Forecast'], 
                        ['Find Object', 'Show Coordinates'],
-                       ['Settings']]
+                       [loc_button]]
     reply_markup = telegram.ReplyKeyboardMarkup(custom_keyboard)
     context.bot.send_message(chat_id=chat_id, 
                     text="Awesome! Thanks :)", 
                     reply_markup=reply_markup)
-
-
-
-
 
 image_platesolve_handler = MessageHandler(Filters.photo, platesolve_image)
 dispatcher.add_handler(image_platesolve_handler)    

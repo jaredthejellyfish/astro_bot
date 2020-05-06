@@ -5,3 +5,4 @@ test_satellite_image.gif
 done
 .vscode
 .DS*
+*.code-workspace
