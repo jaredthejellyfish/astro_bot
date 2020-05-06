@@ -92,6 +92,7 @@ class Satellite:
             fc = self.sat_fc(lat, lon)
             return error, fc
 
+        # Set ERROR flag if no time of day could be selected
         else:
             return True, '0'
 
