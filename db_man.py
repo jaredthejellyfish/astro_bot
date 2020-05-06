@@ -7,13 +7,13 @@ connection = sqlite3.connect('users.db')
 # Create cursor 
 cursor = connection.cursor()
 
-command_1 = ''CREATE TABLE IF NOT EXISTS
-users(chat_id INTERGER PRIMARY key, 
-      lat FLOAT, 
-      lon FLOAT, 
-      timee INTERGER)'
+create_db = ''CREATE TABLE IF NOT EXISTS
+              users(chat_id INTERGER PRIMARY key, 
+                    lat FLOAT, 
+                    lon FLOAT, 
+                    time INTERGER)'
 
-cursor.execute(command_1)
+cursor.execute(create_db)
 
 # Add to users 
 cursor.execute('INSERT INTO users VALUES (2654321, 41.28610, 1.98241, 1588747199)')
@@ -27,6 +27,13 @@ class Database:
     def __init__(self):
         self.conn = sqlite3.connect('users.db')
         self.curs = self.conn.cursor()
+        create_db = '''CREATE TABLE IF NOT EXISTS
+                       users(chat_id INTERGER PRIMARY key, 
+                             lat FLOAT, 
+                             lon FLOAT, 
+                             time INTERGER)'''
+
+        self.curs.execute(create_db)
 
     def chk_user(self, chat_id):
         self.curs.execute('SELECT lat FROM users WHERE chat_id = {}'.format(chat_id))
