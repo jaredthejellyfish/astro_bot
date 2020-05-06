@@ -72,6 +72,10 @@ class Satellite:
         # Gets time of day from .day_or_night()
         time_od = self.day_or_night(lat, lon)
 
+        # Set error flag if location cannot be gaged
+        if time_od == None:
+            return True, '0'
+
         # Get DAY sat image from .down_sat() method
         if time_od == True:
             # Set ERROR flag accordingly to .down_sat() output
@@ -97,10 +101,13 @@ class Satellite:
         results = self.geoc.reverse_geocode(lat, lon)
         city = results.city
 
-        # Use owm object to get weather for the nearest city
-        city = self.owm.weather_at_place(city)
-        weather = city.get_weather()
-
+        try:
+            # Use owm object to get weather for the nearest city
+            city = self.owm.weather_at_place(city)
+            weather = city.get_weather()
+        except:
+            return None
+            
         # Return TRUE if time.time() is between SUNSIE and SUNSET (daytime) 
         if int(time.time()) > weather.get_sunrise_time(timeformat='unix') and int(time.time()) < weather.get_sunset_time(timeformat='unix'):
             return True

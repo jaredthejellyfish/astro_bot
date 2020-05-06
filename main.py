@@ -24,17 +24,23 @@ sat = Satellite()
 fc = Forecast()
 
 running_solver = {}
+running_bot = {}
+
+
+
+
 
 class AstroBot:
     def __init__(self, chat_id):
         self.chat_id = chat_id
         self.db = {}
+        self.update_coords()
 
     def sat_gif(self, update, context):
         ready_message = context.bot.send_message(chat_id=self.chat_id, text= 'Getting your forecast ready...')
-        outputs = sat.get_sat(lat, lon, self.chat_id)
+        outputs = sat.get_sat(self.lat, self.lon, self.chat_id)
         if outputs[0]:
-            return True
+            context.bot.edit_message_text(chat_id=self.chat_id, message_id=ready_message.message_id, text='Oh no! Looks like there was an error getting your forecast :( \nPlease try again later.')
         else:
             context.bot.edit_message_text(chat_id=self.chat_id, message_id=ready_message.message_id, text='Here is your forecast... ')
             context.bot.send_animation(chat_id=self.chat_id, 
@@ -43,8 +49,8 @@ class AstroBot:
                                        parse_mode=telegram.ParseMode.HTML)
             sat.cleanup(self.chat_id)
 
-    def clo_forecast(self, update, context):
-        clo_url, text = fc.get_fc(lat, lon)
+    def clo_forecast(self, update, context,):
+        clo_url, text = fc.get_fc(self.lat, self.lon)
         context.bot.sendPhoto(chat_id=self.chat_id, photo=clo_url, caption=text)
 
     def find_object(self, update, context):
@@ -54,29 +60,53 @@ class AstroBot:
         pass
 
     def gage_intent(self, update, context):
-        pass
+        if update.message.text == 'Satellite Forecast':
+            self.update_coords()
+            self.sat_gif(update, context)
+
+        if update.message.text == 'Clearoutside Forecast':
+            self.update_coords()
+            self.clo_forecast(update, context)
+
+    def update_coords(self):
+        self.lat = lat
+        self.lon = lon
 
     def store_location(self, lat, lon, chat_id):
         pass
 
+
+
+
+
 @run_async
 def manage_bot(update, context):
     chat_id = update.effective_chat.id
-    ab = AstroBot(chat_id)
-    ab.sat_gif(update, context)
+
+    if chat_id not in running_bot.keys():
+        bot = AstroBot(chat_id)
+        running_bot[chat_id] = bot
+        bot.gage_intent(update, context)
+
+    else:
+        bot = running_bot[chat_id]
+        bot.gage_intent(update, context)
         
 @run_async
 def platesolve_image(update, context):
     file_id = update.message.photo[-1].file_id
     chat_id = update.message.chat_id
+
     if chat_id not in running_solver.keys():
         pl = Platesolver(chat_id)
         running_solver[chat_id] = pl
+
         if pl.platesolve(file_id, context, update) is False:
             try:
                 running_solver.pop(chat_id)
             except KeyError:
                 print("Key {} not found".format(chat_id))
+
     else:
         context.bot.send_message(chat_id=chat_id, text= 'The solver is already running, I can only handle one image per user.')
 
@@ -92,15 +122,22 @@ def start(update, context):
 
 @run_async
 def location(update, context):
+    global lat, lon
     chat_id = update.message.chat_id
     user_location = update.message.location
-    custom_keyboard = [['Satellite Image', 'Forecast'], 
+    lat = round(user_location.latitude, 5)
+    lon = round(user_location.longitude,5)
+    custom_keyboard = [['Satellite Forecast', 'Clearoutside Forecast'], 
                        ['Find Object', 'Show Coordinates'],
                        ['Settings']]
     reply_markup = telegram.ReplyKeyboardMarkup(custom_keyboard)
     context.bot.send_message(chat_id=chat_id, 
                     text="Awesome! Thanks :)", 
                     reply_markup=reply_markup)
+
+
+
+
 
 image_platesolve_handler = MessageHandler(Filters.photo, platesolve_image)
 dispatcher.add_handler(image_platesolve_handler)    
