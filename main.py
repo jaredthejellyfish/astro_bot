@@ -124,12 +124,13 @@ def platesolve_image(update, context):
 @run_async
 def start(update, context):
     chat_id = update.message.chat_id
+    context.bot.send_message(chat_id=chat_id, text="Welocme to AstroPlan! \nA bot designed to make you astronomy planning journey esier.")
 
     location_keyboard = telegram.KeyboardButton(text="Send my location!", request_location=True)
     custom_keyboard = [[location_keyboard]]
     reply_markup = telegram.ReplyKeyboardMarkup(custom_keyboard)
     context.bot.send_message(chat_id=chat_id, 
-                    text="Welocme to AstroPlan! \nA bot designed to make you astronomy planning journey esier.", 
+                    text="\nMost of my services are location based so I'm gonna need your location to work. Press the button below if you would like to share it with me.", 
                     reply_markup=reply_markup)
 
 @run_async
@@ -149,7 +150,7 @@ def location(update, context):
                        [loc_button]]
     reply_markup = telegram.ReplyKeyboardMarkup(custom_keyboard)
     context.bot.send_message(chat_id=chat_id, 
-                    text="Awesome! Thanks :)", 
+                    text="Awesome! I'll put it in the database so you can use it later :)", 
                     reply_markup=reply_markup)
 
 image_platesolve_handler = MessageHandler(Filters.photo, platesolve_image)
