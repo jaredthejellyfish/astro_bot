@@ -1,17 +1,26 @@
 import requests
+import os
 
 class Soho:
-    def __init__(self):
-        pass
-
-    def get_soho(self, chat_id='test_soho_image'):
-        uri = 'https://sohowww.nascom.nasa.gov/data/LATEST/current_c2.gif'
+    def get_gif(self, chat_id='test_soho_image'):
+        uri = 'https://sohowww.nascom.nasa.gov/data/LATEST/current_c2small.mp4'
         try:
-            with open('soho_{}.gif'.format(chat_id), 'wb') as f:
+            with open('soho_{}.mp4'.format(chat_id), 'wb') as f:
                         f.write(requests.get(uri).content)
         except:
             return True
 
+    def cleanup(self, chat_id='test_soho_image'):
+        try:
+            # Clean directory after use of the image
+            os.remove('soho_{}.mp4'.format(chat_id))
+        except:
+            pass
+
+
+
+chat_id = 'test_soho_image'
 
 soho = Soho()
-soho.get_soho()
+soho.get_gif()
+#soho.cleanup()

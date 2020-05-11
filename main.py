@@ -2,6 +2,7 @@ from forecast import Forecast
 from satellite import Satellite
 from platesolve import Platesolver
 from db_man import Database
+from soho import Soho
 
 import telegram
 from telegram.ext import CallbackQueryHandler, CommandHandler, Filters, MessageHandler, Updater, dispatcher, run_async
@@ -21,6 +22,7 @@ dispatcher = updater.dispatcher
 
 sat = Satellite()
 fc = Forecast()
+soho = Soho()
 
 running_solver = {}
 running_bot = {}
@@ -47,6 +49,18 @@ class AstroBot:
         clo_url, text = fc.get_fc(self.lat, self.lon)
         context.bot.sendPhoto(chat_id=self.chat_id, photo=clo_url, caption=text)
 
+    def soho_gif(self, update, context):
+        ready_message = context.bot.send_message(chat_id=self.chat_id, text= 'Getting your SOHO animation ready...')
+        output = soho.get_gif(self.chat_id)
+        if output:
+            context.bot.edit_message_text(chat_id=self.chat_id, message_id=ready_message.message_id, text='Oh dang! Looks like there was an error getting your GIF :( \nPlease try again later.')
+        else:
+            context.bot.edit_message_text(chat_id=self.chat_id, message_id=ready_message.message_id, text='Here is your gif, careful, its hot... ')
+            context.bot.send_video(chat_id=self.chat_id, 
+                                   video= open('soho_' + str(self.chat_id) + '.mp4', 'rb')) 
+
+            #soho.cleanup(self.chat_id)
+
     def find_object(self, update, context):
         pass
 
@@ -66,6 +80,12 @@ class AstroBot:
                     return
                 self.clo_forecast(update, context)
 
+            if update.message.text == 'SOHO Latest':
+                if self.get_location():
+                    self.askfor_location(update, context)
+                    return
+                self.soho_gif(update, context)
+
             if update.message.text == 'Find Object':
                 if self.get_location():
                     self.askfor_location(update, context)
@@ -77,6 +97,8 @@ class AstroBot:
                     self.askfor_location(update, context)
                     return
                 self.show_coordinates(update, context)
+
+            
 
     def get_location(self):
         db = Database()
@@ -146,7 +168,7 @@ def location(update, context):
 
     loc_button = telegram.KeyboardButton(text="Update Location", request_location=True)
     custom_keyboard = [['Satellite Forecast', 'Clearoutside Forecast'], 
-                       ['Find Object', 'Show Coordinates'],
+                       ['SOHO Latest', 'Find Object', 'Show Coordinates'],
                        [loc_button]]
     reply_markup = telegram.ReplyKeyboardMarkup(custom_keyboard)
     context.bot.send_message(chat_id=chat_id, 
