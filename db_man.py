@@ -1,28 +1,6 @@
 import sqlite3
 import time
 
-'''# define connection
-connection = sqlite3.connect('users.db')
-
-# Create cursor 
-cursor = connection.cursor()
-
-create_db = ''CREATE TABLE IF NOT EXISTS
-              users(chat_id INTERGER PRIMARY key, 
-                    lat FLOAT, 
-                    lon FLOAT, 
-                    time INTERGER)'
-
-cursor.execute(create_db)
-
-# Add to users 
-cursor.execute('INSERT INTO users VALUES (2654321, 41.28610, 1.98241, 1588747199)')
-connection.commit()
-# Get values
-cursor.execute('SELECT chat_id FROM users')
-res = cursor.fetchall()
-print(res) '''
-
 class Database:
     def __init__(self):
         self.conn = sqlite3.connect('users.db')

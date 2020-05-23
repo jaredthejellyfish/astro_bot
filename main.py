@@ -31,6 +31,7 @@ class AstroBot:
     def __init__(self, chat_id):
         self.chat_id = chat_id
         self.get_location()
+        self.f_obj_mode = False
 
     def sat_gif(self, update, context):
         ready_message = context.bot.send_message(chat_id=self.chat_id, text= 'Getting your forecast ready...')
@@ -56,10 +57,10 @@ class AstroBot:
             context.bot.edit_message_text(chat_id=self.chat_id, message_id=ready_message.message_id, text='Oh dang! Looks like there was an error getting your GIF :( \nPlease try again later.')
         else:
             context.bot.edit_message_text(chat_id=self.chat_id, message_id=ready_message.message_id, text='Here is your gif, careful, its hot... ')
-            context.bot.send_video(chat_id=self.chat_id, 
-                                   video= open('soho_' + str(self.chat_id) + '.mp4', 'rb')) 
+            context.bot.send_video( chat_id=self.chat_id, 
+                                    video= open('soho_' + str(self.chat_id) + '.mp4', 'rb')) 
 
-            #soho.cleanup(self.chat_id)
+            soho.cleanup(self.chat_id)
 
     def find_object(self, update, context):
         pass
@@ -86,13 +87,14 @@ class AstroBot:
                     return
                 self.soho_gif(update, context)
 
-            if update.message.text == 'Find Object':
-                if self.get_location():
-                    self.askfor_location(update, context)
-                    return
-                self.find_object(update, context)
+            if update.message.text == 'Find Object' or self.f_obj_mode == True:
+                if self.f_obj_mode == False:
+                    self.f_obj_mode = True
 
-            if update.message.text == 'Show Coordinates':
+                elif self.f_obj_mode == True:
+                    self.find_object(update, context)
+
+            if update.message.text == 'AllSky Image':
                 if self.get_location():
                     self.askfor_location(update, context)
                     return
@@ -168,7 +170,7 @@ def location(update, context):
 
     loc_button = telegram.KeyboardButton(text="Update Location", request_location=True)
     custom_keyboard = [['Satellite Forecast', 'Clearoutside Forecast'], 
-                       ['SOHO Latest', 'Find Object', 'Show Coordinates'],
+                       ['SOHO Latest', 'Find Object', 'AllSky Image'],
                        [loc_button]]
     reply_markup = telegram.ReplyKeyboardMarkup(custom_keyboard)
     context.bot.send_message(chat_id=chat_id, 
