@@ -50,9 +50,13 @@ class SDSS:
 
     #Find object coordinates from "nickname" input.
     def find_object_coords_fname(self, object_name, chat_id):
-        #Query Simbad for the object.
-        result_table = Simbad.query_object(object_name)
         try:
+            #Query Simbad for the object.
+            result_table = Simbad.query_object(object_name)
+            if result_table == None:
+                print('errrorrrrr')
+                self.object_at_string = None
+                return True
             #Extract RA & DEC
             obj_ra = result_table['RA'][0].replace(" ", ":")
             obj_dec = result_table['DEC'][0].replace(" ", ":")
@@ -72,15 +76,6 @@ class SDSS:
     def cleanup(self, chat_id):
         os.remove('SDSS_' + str(chat_id) + '.jpg')
 
-
-
     def get_SDDS(self, update, context, chat_id):
         object_name = update.message.text
-        ready_message = context.bot.send_message(chat_id=chat_id, text= 'Getting your SDSS image and coordinates ready...')
-        if self.find_object_coords_fname(object_name, chat_id) == False:
-
-            context.bot.sendPhoto(  chat_id=chat_id, 
-                                    photo=open('SDSS_' + str(chat_id) + '.jpg', 'rb'), 
-                                    caption=self.object_at_string,
-                                    parse_mode=telegram.ParseMode.HTML)
-            self.cleanup(chat_id)
+        return [self.find_object_coords_fname(object_name, chat_id), self.object_at_string]

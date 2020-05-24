@@ -67,7 +67,17 @@ class AstroBot:
             self.soho.cleanup(self.chat_id)
 
     def find_object(self, update, context):
-        self.sdss.get_SDDS(update, context, self.chat_id)
+        output = self.sdss.get_SDDS(update, context, self.chat_id)
+        ready_message = context.bot.send_message(chat_id=self.chat_id, text= 'Getting your SDSS image and coordinates ready...')
+        if output[0] == False:
+            context.bot.sendPhoto(  chat_id=self.chat_id, 
+                                    photo=open('SDSS_' + str(self.chat_id) + '.jpg', 'rb'), 
+                                    caption=output[1],
+                                    parse_mode=telegram.ParseMode.HTML)
+            self.alsk.cleanup(self.chat_id)
+        elif output[0] == True:
+            context.bot.edit_message_text(chat_id=self.chat_id, message_id=ready_message.message_id, text='Oh no! Looks like there was an error getting your object :( \nPlease try again later.')
+            self.alsk.cleanup(self.chat_id)
 
     def all_sky(self, update, context):
         ready_message = context.bot.send_message(chat_id=self.chat_id, text= 'Getting your All Sky image ready...')
