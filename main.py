@@ -74,7 +74,7 @@ class AstroBot:
                                     photo=open('SDSS_' + str(self.chat_id) + '.jpg', 'rb'), 
                                     caption=output[1],
                                     parse_mode=telegram.ParseMode.HTML)
-            self.alsk.cleanup(self.chat_id)
+            self.sdss.cleanup(self.chat_id)
         elif output[0] == True:
             context.bot.edit_message_text(chat_id=self.chat_id, message_id=ready_message.message_id, text='Oh no! Looks like there was an error getting your object :( \nPlease try again later.')
 
