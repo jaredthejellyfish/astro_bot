@@ -81,5 +81,6 @@ class SDSS:
 
             context.bot.sendPhoto(  chat_id=chat_id, 
                                     photo=open('SDSS_' + str(chat_id) + '.jpg', 'rb'), 
-                                    caption=self.object_at_string)
+                                    caption=self.object_at_string,
+                                    parse_mode=telegram.ParseMode.HTML)
             self.cleanup(chat_id)

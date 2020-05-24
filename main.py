@@ -4,6 +4,7 @@ from platesolve import Platesolver
 from db_man import Database
 from soho import Soho
 from sdss_finder import SDSS
+from all_sky import AllSky
 
 import telegram
 from telegram.ext import CallbackQueryHandler, CommandHandler, Filters, MessageHandler, Updater, dispatcher, run_async
@@ -29,10 +30,12 @@ class AstroBot:
         self.chat_id = chat_id
         self.get_location()
         self.f_obj_mode = False
+
         self.sat = Satellite()
         self.fc = Forecast()
         self.soho = Soho()
         self.sdss = SDSS()
+        self.alsk = AllSky()
 
     def sat_gif(self, update, context):
         ready_message = context.bot.send_message(chat_id=self.chat_id, text= 'Getting your forecast ready...')
@@ -67,7 +70,16 @@ class AstroBot:
         self.sdss.get_SDDS(update, context, self.chat_id)
 
     def all_sky(self, update, context):
-        pass
+        ready_message = context.bot.send_message(chat_id=self.chat_id, text= 'Getting your All Sky image ready...')
+        if self.alsk.get_jpg(self.chat_id):
+            context.bot.edit_message_text(chat_id=self.chat_id, message_id=ready_message.message_id, text='Oh no! Looks like there was an error getting your image :( \nPlease try again later.')
+        else:
+            context.bot.edit_message_text(chat_id=self.chat_id, message_id=ready_message.message_id, text='Here is your image... ')
+            context.bot.sendPhoto(chat_id=self.chat_id, 
+                                        photo= open('allsky_{}.jpg'.format(self.chat_id), 'rb'), 
+                                        caption='Looks like the sky is still there!', 
+                                        parse_mode=telegram.ParseMode.HTML)
+            self.alsk.cleanup(self.chat_id)
 
     def gage_intent(self, update, context):
             if update.message.text == 'Find Object' or self.f_obj_mode == True:
@@ -78,7 +90,6 @@ class AstroBot:
                 elif self.f_obj_mode == True:
                     self.f_obj_mode = False
                     self.find_object(update, context)
-                    
 
             if update.message.text == 'Satellite Forecast':
                 if self.get_location():
@@ -103,8 +114,6 @@ class AstroBot:
                     self.askfor_location(update, context)
                     return
                 self.all_sky(update, context)
-
-            
 
     def get_location(self):
         db = Database()
