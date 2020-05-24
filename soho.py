@@ -16,11 +16,3 @@ class Soho:
             os.remove('soho_{}.mp4'.format(chat_id))
         except:
             pass
-
-
-
-chat_id = 'test_soho_image'
-
-soho = Soho()
-soho.get_gif()
-#soho.cleanup()

@@ -3,6 +3,7 @@ from satellite import Satellite
 from platesolve import Platesolver
 from db_man import Database
 from soho import Soho
+from sdss_finder import SDSS
 
 import telegram
 from telegram.ext import CallbackQueryHandler, CommandHandler, Filters, MessageHandler, Updater, dispatcher, run_async
@@ -20,39 +21,39 @@ updater = Updater(token=telegram_token, use_context=True)
 
 dispatcher = updater.dispatcher
 
-sat = Satellite()
-fc = Forecast()
-soho = Soho()
-
 running_solver = {}
 running_bot = {}
 
-class AstroBot:
+class AstroBot:      
     def __init__(self, chat_id):
         self.chat_id = chat_id
         self.get_location()
         self.f_obj_mode = False
+        self.sat = Satellite()
+        self.fc = Forecast()
+        self.soho = Soho()
+        self.sdss = SDSS()
 
     def sat_gif(self, update, context):
         ready_message = context.bot.send_message(chat_id=self.chat_id, text= 'Getting your forecast ready...')
-        outputs = sat.get_sat(self.lat, self.lon, self.chat_id)
+        outputs = self.sat.get_sat(self.lat, self.lon, self.chat_id)
         if outputs[0]:
             context.bot.edit_message_text(chat_id=self.chat_id, message_id=ready_message.message_id, text='Oh no! Looks like there was an error getting your forecast :( \nPlease try again later.')
         else:
             context.bot.edit_message_text(chat_id=self.chat_id, message_id=ready_message.message_id, text='Here is your forecast... ')
             context.bot.send_animation(chat_id=self.chat_id, 
-                                       animation= open(str(self.chat_id)+'.gif', 'rb'), 
-                                       caption=outputs[1], 
-                                       parse_mode=telegram.ParseMode.HTML)
-            sat.cleanup(self.chat_id)
+                                        animation= open(str(self.chat_id)+'.gif', 'rb'), 
+                                        caption=outputs[1], 
+                                        parse_mode=telegram.ParseMode.HTML)
+            self.sat.cleanup(self.chat_id)
 
     def clo_forecast(self, update, context,):
-        clo_url, text = fc.get_fc(self.lat, self.lon)
+        clo_url, text = self.fc.get_fc(self.lat, self.lon)
         context.bot.sendPhoto(chat_id=self.chat_id, photo=clo_url, caption=text)
 
     def soho_gif(self, update, context):
         ready_message = context.bot.send_message(chat_id=self.chat_id, text= 'Getting your SOHO animation ready...')
-        output = soho.get_gif(self.chat_id)
+        output = self.soho.get_gif(self.chat_id)
         if output:
             context.bot.edit_message_text(chat_id=self.chat_id, message_id=ready_message.message_id, text='Oh dang! Looks like there was an error getting your GIF :( \nPlease try again later.')
         else:
@@ -60,15 +61,25 @@ class AstroBot:
             context.bot.send_video( chat_id=self.chat_id, 
                                     video= open('soho_' + str(self.chat_id) + '.mp4', 'rb')) 
 
-            soho.cleanup(self.chat_id)
+            self.soho.cleanup(self.chat_id)
 
     def find_object(self, update, context):
-        pass
+        self.sdss.get_SDDS(update, context, self.chat_id)
 
-    def show_coordinates(self, update, context):
+    def all_sky(self, update, context):
         pass
 
     def gage_intent(self, update, context):
+            if update.message.text == 'Find Object' or self.f_obj_mode == True:
+                if self.f_obj_mode == False:
+                    context.bot.send_message(chat_id=self.chat_id, text= 'What object would you like to find?')
+                    self.f_obj_mode = True
+
+                elif self.f_obj_mode == True:
+                    self.f_obj_mode = False
+                    self.find_object(update, context)
+                    
+
             if update.message.text == 'Satellite Forecast':
                 if self.get_location():
                     self.askfor_location(update, context)
@@ -87,18 +98,11 @@ class AstroBot:
                     return
                 self.soho_gif(update, context)
 
-            if update.message.text == 'Find Object' or self.f_obj_mode == True:
-                if self.f_obj_mode == False:
-                    self.f_obj_mode = True
-
-                elif self.f_obj_mode == True:
-                    self.find_object(update, context)
-
             if update.message.text == 'AllSky Image':
                 if self.get_location():
                     self.askfor_location(update, context)
                     return
-                self.show_coordinates(update, context)
+                self.all_sky(update, context)
 
             
 
