@@ -77,7 +77,6 @@ class AstroBot:
             self.alsk.cleanup(self.chat_id)
         elif output[0] == True:
             context.bot.edit_message_text(chat_id=self.chat_id, message_id=ready_message.message_id, text='Oh no! Looks like there was an error getting your object :( \nPlease try again later.')
-            self.alsk.cleanup(self.chat_id)
 
     def all_sky(self, update, context):
         ready_message = context.bot.send_message(chat_id=self.chat_id, text= 'Getting your All Sky image ready...')

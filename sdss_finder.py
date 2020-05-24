@@ -54,7 +54,6 @@ class SDSS:
             #Query Simbad for the object.
             result_table = Simbad.query_object(object_name)
             if result_table == None:
-                print('errrorrrrr')
                 self.object_at_string = None
                 return True
             #Extract RA & DEC
